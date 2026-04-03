@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import Sidebar from '@/components/Sidebar'
-import { getEmails, suggestReply, sendReply, syncEmails, extractLead } from '@/lib/api'
+import { getEmails, suggestReply, sendReply, syncEmails, extractLead, sendEmail } from '@/lib/api'
 import { formatDistanceToNow } from 'date-fns'
 
 const DUMMY_EMAILS = [
@@ -27,18 +27,45 @@ export default function InboxPage() {
   const [syncing, setSyncing] = useState(false)
   const [extractedLead, setExtractedLead] = useState<any>(null)
 
+  const [isComposing, setIsComposing] = useState(false)
+  const [composeTo, setComposeTo] = useState('')
+  const [composeSubject, setComposeSubject] = useState('')
+  const [composeBody, setComposeBody] = useState('')
+
   useEffect(() => {
     getEmails().then((data: any) => { if (Array.isArray(data) && data.length) setEmails(data) }).catch(() => {})
   }, [])
 
   const handleSelect = (email: typeof DUMMY_EMAILS[0]) => {
     setSelected(email)
+    setIsComposing(false)
     setSuggestedReply('')
     setReplyText('')
     setExtractedLead(null)
     if (!email.is_read) {
       setEmails(prev => prev.map(e => e.id === email.id ? { ...e, is_read: true } : e))
     }
+  }
+
+  const handleCompose = () => {
+    setSelected(null)
+    setIsComposing(true)
+    setComposeTo('')
+    setComposeSubject('')
+    setComposeBody('')
+  }
+
+  const handleSendNew = async () => {
+    if (!composeTo || !composeSubject || !composeBody) return alert('Please fill in all fields')
+    setSending(true)
+    try {
+      await sendEmail({ to: composeTo, subject: composeSubject, body: composeBody })
+      alert('Email sent successfully!')
+      setIsComposing(false)
+    } catch {
+      alert('Failed to send email.')
+    }
+    setSending(false)
   }
 
   const handleSuggest = async () => {
@@ -97,7 +124,10 @@ export default function InboxPage() {
             <div style={{ padding: '20px 20px 14px', borderBottom: '1px solid var(--border)' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
                 <h2 style={{ fontSize: 18, fontWeight: 800 }}>📧 Inbox <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--accent)', marginLeft: 6 }}>{unread} unread</span></h2>
-                <button className="btn btn-ghost btn-sm" onClick={handleSync} disabled={syncing}>{syncing ? '⏳' : '🔄'}</button>
+                <div style={{ display: 'flex', gap: 6 }}>
+                  <button className="btn btn-primary btn-sm" onClick={handleCompose}>✏️ Compose</button>
+                  <button className="btn btn-ghost btn-sm" onClick={handleSync} disabled={syncing}>{syncing ? '⏳' : '🔄'}</button>
+                </div>
               </div>
             </div>
             <div style={{ overflowY: 'auto', flex: 1 }}>
@@ -124,8 +154,32 @@ export default function InboxPage() {
           </div>
 
           {/* Email detail + AI panel */}
-          <div style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-            {selected ? (
+          <div style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', background: isComposing ? 'var(--card-bg, #fff)' : undefined }}>
+            {isComposing ? (
+              <div style={{ padding: '40px', maxWidth: 800 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+                  <h2 style={{ fontSize: 24, fontWeight: 800 }}>New Message</h2>
+                  <button className="btn btn-ghost btn-sm" onClick={() => setIsComposing(false)}>✖ Cancel</button>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                  <div>
+                    <label className="form-label">To</label>
+                    <input className="form-input" placeholder="recipient@example.com" value={composeTo} onChange={e => setComposeTo(e.target.value)} />
+                  </div>
+                  <div>
+                    <label className="form-label">Subject</label>
+                    <input className="form-input" placeholder="Email subject..." value={composeSubject} onChange={e => setComposeSubject(e.target.value)} />
+                  </div>
+                  <div>
+                    <label className="form-label">Message</label>
+                    <textarea className="form-textarea" style={{ minHeight: 300, fontSize: 14 }} placeholder="Type your message here..." value={composeBody} onChange={e => setComposeBody(e.target.value)} />
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'flex-start', marginTop: 10 }}>
+                    <button className="btn btn-primary" onClick={handleSendNew} disabled={sending}>{sending ? 'Sending...' : '📤 Send Email'}</button>
+                  </div>
+                </div>
+              </div>
+            ) : selected ? (
               <>
                 <div style={{ padding: '20px 28px', borderBottom: '1px solid var(--border)' }}>
                   <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 6 }}>{selected.subject}</div>
