@@ -1,7 +1,5 @@
 databases:
   - name: sales_coworker_db
-    databaseName: salesdb
-    user: postgres
     plan: free
 
 services:
