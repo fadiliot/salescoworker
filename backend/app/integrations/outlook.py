@@ -18,6 +18,10 @@ class OutlookClient:
         self.db = db
 
     def get_auth_url(self) -> str:
+        import base64, hashlib
+        code_verifier = "sales_coworker_static_pkce_verifier_string_123"
+        code_challenge = base64.urlsafe_b64encode(hashlib.sha256(code_verifier.encode('ascii')).digest()).decode('ascii').rstrip('=')
+        
         scopes = settings.MS_SCOPES.replace(" ", "%20")
         params = (
             f"client_id={settings.MS_CLIENT_ID}"
@@ -25,6 +29,8 @@ class OutlookClient:
             f"&redirect_uri={urllib.parse.quote(settings.MS_REDIRECT_URI)}"
             f"&scope={scopes}"
             f"&response_mode=query"
+            f"&code_challenge={code_challenge}"
+            f"&code_challenge_method=S256"
         )
         return f"https://login.microsoftonline.com/{settings.MS_TENANT_ID}/oauth2/v2.0/authorize?{params}"
 
@@ -38,6 +44,7 @@ class OutlookClient:
                     "code": code,
                     "redirect_uri": settings.MS_REDIRECT_URI,
                     "grant_type": "authorization_code",
+                    "code_verifier": "sales_coworker_static_pkce_verifier_string_123"
                 },
             )
             data = resp.json()
