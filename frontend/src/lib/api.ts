@@ -56,5 +56,10 @@ export const getZohoInvoices = () => API.get('/api/integrations/zoho/invoices').
 export const getPipelineInsights = () => API.get('/api/ai/pipeline-insights').then(r => r.data)
 export const scoreAllLeads = () => API.post('/api/ai/score-all-leads').then(r => r.data)
 export const generateFollowup = (data: any) => API.post('/api/ai/generate-followup', data).then(r => r.data)
+export const getUpcomingMeetings = () => API.get('/api/ai/upcoming-meetings').then(r => r.data)
+export const getTearSheet = (eventId: string, attendeeEmails: string) =>
+  API.get(`/api/ai/tear-sheet/${eventId}`, { params: { attendee_emails: attendeeEmails } }).then(r => r.data)
+export const analyzeRecentCalls = (leadId?: string) =>
+  API.post('/api/activities/calls/analyze', null, { params: { lead_id: leadId } }).then(r => r.data)
 
 export default API

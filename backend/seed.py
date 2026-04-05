@@ -18,6 +18,14 @@ import random
 db = SessionLocal()
 
 print("Seeding database...")
+# Clear existing data safely
+print("Clearing existing data...")
+db.query(Reminder).delete()
+db.query(Activity).delete()
+db.query(Email).delete()
+db.query(Deal).delete()
+db.query(Lead).delete()
+db.commit()
 
 # Leads
 leads_data = [

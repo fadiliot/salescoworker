@@ -84,3 +84,18 @@ async def click_to_call(caller_ext: str, callee_number: str):
     if success:
         return {"message": f"Call initiated from {caller_ext} to {callee_number}"}
     raise HTTPException(status_code=500, detail="Failed to initiate call")
+
+
+@router.post("/calls/analyze")
+async def analyze_recent_calls(lead_id: Optional[str] = None, db: Session = Depends(get_db)):
+    """Fetch recent Yeastar CDRs, run Gemini analysis, and log Activity + Reminder rows"""
+    if not yeastar.is_configured():
+        return {"analyzed": 0, "message": "Yeastar PBX not configured"}
+    from app.ai.call_analyzer import analyze_call
+    cdrs = await yeastar.get_recent_cdrs(limit=5)
+    results = []
+    for cdr in cdrs:
+        result = await analyze_call(db, cdr, lead_id=lead_id)
+        results.append(result)
+    return {"analyzed": len(results), "results": results}
+

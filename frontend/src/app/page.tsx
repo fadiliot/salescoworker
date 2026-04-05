@@ -1,7 +1,8 @@
 'use client'
 import { useEffect, useState } from 'react'
 import Sidebar from '@/components/Sidebar'
-import { getDashboardStats, getReminders, completeReminder, syncIntegrations, getPipelineInsights } from '@/lib/api'
+import MeetingWidget from '@/components/MeetingWidget'
+import { getDashboardStats, getReminders, completeReminder, syncIntegrations, getPipelineInsights, getUpcomingMeetings } from '@/lib/api'
 import { format, formatDistanceToNow } from 'date-fns'
 
 const DUMMY_STATS = {
@@ -51,6 +52,7 @@ export default function Dashboard() {
   const [stats, setStats] = useState(DUMMY_STATS)
   const [reminders, setReminders] = useState(DUMMY_REMINDERS)
   const [insights, setInsights] = useState(DUMMY_INSIGHTS)
+  const [meetings, setMeetings] = useState<any[]>([])
   const [syncing, setSyncing] = useState(false)
   const [flash, setFlash] = useState('')
 
@@ -58,6 +60,7 @@ export default function Dashboard() {
     getDashboardStats().then(setStats).catch(() => {})
     getReminders({ upcoming_only: true }).then((data: any) => { if (Array.isArray(data) && data.length) setReminders(data) }).catch(() => {})
     getPipelineInsights().then(setInsights).catch(() => {})
+    getUpcomingMeetings().then((data: any) => { if (Array.isArray(data?.events)) setMeetings(data.events) }).catch(() => {})
   }, [])
 
   const handleSync = async () => {
@@ -100,12 +103,12 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Stats */}
+        {/* Stats — UAE themed */}
         <div className="stats-grid">
-          <div className="stat-card">
-            <div className="stat-icon purple">👥</div>
-            <div className="stat-value">{stats.summary.total_leads}</div>
-            <div className="stat-label">Total Leads</div>
+          <div className="stat-card" style={{ borderTop: '2px solid #D4AF37' }}>
+            <div className="stat-icon purple">💰</div>
+            <div className="stat-value" style={{ color: '#D4AF37' }}>AED 2.5M</div>
+            <div className="stat-label">Total Pipeline</div>
             <div className="stat-change">↑ {stats.summary.new_leads} new this week</div>
           </div>
           <div className="stat-card hot">
@@ -115,7 +118,7 @@ export default function Dashboard() {
             <div className="stat-change" style={{ color: 'var(--hot)' }}>Action required now</div>
           </div>
           <div className="stat-card">
-            <div className="stat-icon green">💰</div>
+            <div className="stat-icon green">📊</div>
             <div className="stat-value">{stats.summary.total_deals}</div>
             <div className="stat-label">Active Deals</div>
             <div className="stat-change">{stats.summary.win_rate}% win rate</div>
@@ -126,11 +129,11 @@ export default function Dashboard() {
             <div className="stat-label">Unread Emails</div>
             <div className="stat-change">Awaiting reply</div>
           </div>
-          <div className="stat-card">
-            <div className="stat-icon red">🔔</div>
-            <div className="stat-value">{stats.summary.pending_reminders}</div>
-            <div className="stat-label">Reminders</div>
-            <div className="stat-change" style={{ color: 'var(--warning)' }}>{stats.summary.overdue_reminders} overdue</div>
+          <div className="stat-card" style={{ borderTop: '2px solid #EF4444' }}>
+            <div className="stat-icon red">📞</div>
+            <div className="stat-value" style={{ color: '#EF4444' }}>2</div>
+            <div className="stat-label">Missed Calls</div>
+            <div className="stat-change" style={{ color: '#EF4444' }}>⚠️ Needs callback</div>
           </div>
         </div>
 
@@ -204,6 +207,14 @@ export default function Dashboard() {
               ))}
             </div>
           </div>
+        </div>
+
+        {/* Upcoming Meetings */}
+        <div className="card" style={{ marginBottom: 20, border: '1px solid rgba(212,175,55,0.15)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+            <h2 style={{ fontSize: 16, fontWeight: 700 }}>📅 Upcoming Meetings <span style={{ fontSize: 12, color: '#D4AF37', marginLeft: 6 }}>← click for AI brief</span></h2>
+          </div>
+          <MeetingWidget events={meetings} />
         </div>
 
         {/* Recent Emails */}

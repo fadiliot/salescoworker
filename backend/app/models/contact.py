@@ -1,9 +1,19 @@
 import uuid
+import enum
 from datetime import datetime
-from sqlalchemy import Column, String, DateTime, Text, ForeignKey
+from sqlalchemy import Column, String, DateTime, Text, ForeignKey, Enum
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from app.database import Base
+
+
+class StakeholderRole(str, enum.Enum):
+    champion = "Champion"
+    gatekeeper = "Gatekeeper"
+    economic_buyer = "Economic Buyer"
+    evaluator = "Evaluator"
+    legal = "Legal"
+    unknown = "Unknown"
 
 
 class Contact(Base):
@@ -17,6 +27,7 @@ class Contact(Base):
     phone = Column(String(50), nullable=True)
     company = Column(String(255), nullable=True)
     title = Column(String(150), nullable=True)
+    role_type = Column(Enum(StakeholderRole), default=StakeholderRole.unknown, nullable=True)
     notes = Column(Text, nullable=True)
 
     # Zoho sync

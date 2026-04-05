@@ -1,147 +1,161 @@
+"""
+AI Router — Tear Sheet + existing pipeline insight endpoints.
+"""
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from typing import Optional, List
-from uuid import UUID
 from app.database import get_db
-from app.models.lead import Lead
+from app.integrations.outlook import OutlookClient
 from app.models.email import Email
+from app.models.activity import Activity, ActivityType
+from app.models.contact import Contact
 from app.models.deal import Deal
-from app.ai.email_analyzer import analyze_email
-from app.ai.reply_generator import generate_reply, generate_followup
-from app.ai.lead_scorer import score_lead, batch_score_leads
-from app.ai.insights import get_pipeline_insights, suggest_next_actions
-from pydantic import BaseModel
-from datetime import datetime
+import json
 
 router = APIRouter(prefix="/api/ai", tags=["AI"])
 
 
-class AnalyzeEmailRequest(BaseModel):
-    subject: str
-    body: str
-    from_address: str
+@router.get("/upcoming-meetings")
+async def get_upcoming_meetings(db: Session = Depends(get_db)):
+    """Fetch upcoming Outlook calendar events for the Meetings widget"""
+    client = OutlookClient(db)
+    try:
+        events = await client.get_upcoming_events(hours_ahead=48)
+        return {"events": events}
+    except Exception:
+        return {"events": []}
 
 
-class GenerateReplyRequest(BaseModel):
-    subject: str
-    body: str
-    from_address: str
-    context: Optional[str] = None
-    agent_name: Optional[str] = "Sales Team"
+@router.get("/tear-sheet/{event_id}")
+async def get_tear_sheet(event_id: str, attendee_emails: str = "", db: Session = Depends(get_db)):
+    """
+    Generate a 4-bullet Gemini briefing for a meeting.
+    attendee_emails: comma-separated list of attendee email addresses.
+    """
+    from app.config import get_settings
+    import google.generativeai as genai
 
+    settings = get_settings()
+    emails_list = [e.strip() for e in attendee_emails.split(",") if e.strip()]
 
-class GenerateFollowupRequest(BaseModel):
-    lead_name: str
-    last_activity: str
-    deal_stage: Optional[str] = "new"
-    agent_name: Optional[str] = "Sales Team"
+    # Gather context: emails, call activities, deals
+    context_parts = []
+    for email_addr in emails_list[:3]:  # cap at 3 attendees for token budget
+        # Recent emails from/to this person
+        recent_emails = db.query(Email).filter(
+            (Email.from_address.ilike(f"%{email_addr}%")) |
+            (Email.to_address.ilike(f"%{email_addr}%"))
+        ).order_by(Email.received_at.desc()).limit(3).all()
 
+        for e in recent_emails:
+            context_parts.append(f"Email [{e.received_at}] {e.from_address}: {e.subject} — {(e.ai_summary or e.body_text or '')[:200]}")
 
-@router.post("/analyze-email")
-def analyze_email_endpoint(req: AnalyzeEmailRequest):
-    """Analyze an email and return summary, sentiment, extracted lead"""
-    result = analyze_email(req.subject, req.body, req.from_address)
-    return result
+        # Recent call activities linked to contacts with this email
+        contact = db.query(Contact).filter(Contact.email.ilike(f"%{email_addr}%")).first()
+        if contact and contact.lead_id:
+            calls = db.query(Activity).filter(
+                Activity.lead_id == contact.lead_id,
+                Activity.activity_type == ActivityType.call
+            ).order_by(Activity.occurred_at.desc()).limit(2).all()
+            for c in calls:
+                context_parts.append(f"Call [{c.occurred_at}] {c.title}: {c.description or ''} Sentiment: {c.outcome or 'unknown'}")
 
+            # Open deals
+            deals = db.query(Deal).filter(Deal.lead_id == contact.lead_id).limit(2).all()
+            for d in deals:
+                context_parts.append(f"Deal: {d.title} | Stage: {d.stage} | Value: AED {d.amount or 0:,}")
 
-@router.post("/generate-reply")
-def generate_reply_endpoint(req: GenerateReplyRequest):
-    """Generate an AI reply for a given email"""
-    reply = generate_reply(
-        subject=req.subject,
-        body=req.body,
-        from_address=req.from_address,
-        agent_name=req.agent_name or "Sales Team",
-        context=req.context,
+    if not context_parts:
+        return {
+            "event_id": event_id,
+            "brief": [
+                "No prior history found for attendees in this system.",
+                "This appears to be a first-contact meeting.",
+                "Research attendee company before joining.",
+                "Prepare discovery questions around their key pain points.",
+            ]
+        }
+
+    context_text = "\n".join(context_parts)
+    prompt = (
+        f"You are a sales intelligence assistant. Based on this history with the prospect:\n\n"
+        f"{context_text}\n\n"
+        f"Write EXACTLY 4 bullet-point insights for the sales agent to review 15 minutes before their meeting. "
+        f"Each bullet must be specific, actionable, and under 20 words. "
+        f"Format: return only a JSON array of 4 strings."
     )
-    return {"reply": reply}
+
+    try:
+        genai.configure(api_key=settings.GEMINI_API_KEY or "")
+        model = genai.GenerativeModel("gemini-1.5-flash")
+        response = model.generate_content(prompt)
+        text = response.text.strip()
+        if "```" in text:
+            text = text.split("```")[1].replace("json", "").strip()
+        bullets = json.loads(text)
+        return {"event_id": event_id, "brief": bullets[:4]}
+    except Exception:
+        return {
+            "event_id": event_id,
+            "brief": [
+                f"History found for {len(emails_list)} attendee(s) — review email threads.",
+                "Check open deals and their current stage before joining.",
+                "Last touchpoint and sentiment logged in Activities.",
+                "Prepare relevant case studies and pricing flexibility.",
+            ]
+        }
 
 
-@router.post("/generate-followup")
-def generate_followup_endpoint(req: GenerateFollowupRequest):
-    """Generate an AI follow-up email"""
-    followup = generate_followup(
-        lead_name=req.lead_name,
-        last_activity=req.last_activity,
-        deal_stage=req.deal_stage or "new",
-        agent_name=req.agent_name or "Sales Team",
-    )
-    return {"followup": followup}
+@router.get("/pipeline-insights")
+def pipeline_insights(db: Session = Depends(get_db)):
+    from app.models.lead import Lead
+    from app.models.deal import Deal
+    from app.ai.insights import get_pipeline_insights
+    from datetime import datetime
 
+    leads = db.query(Lead).all()
+    deals = db.query(Deal).all()
+    stages = {}
+    for d in deals:
+        stage = str(d.stage)
+        stages[stage] = stages.get(stage, 0) + 1
 
-@router.post("/score-lead/{lead_id}")
-def score_lead_endpoint(lead_id: UUID, db: Session = Depends(get_db)):
-    """Score a specific lead using AI"""
-    lead = db.query(Lead).filter(Lead.id == lead_id).first()
-    if not lead:
-        raise HTTPException(status_code=404, detail="Lead not found")
-    days_since = 0
-    if lead.last_contacted_at:
-        days_since = (datetime.utcnow() - lead.last_contacted_at).days
-    deal_stage = str(lead.deals[0].stage) if lead.deals else None
-    deal_amount = lead.deals[0].amount if lead.deals else None
-    score_data = score_lead({
-        "name": f"{lead.first_name} {lead.last_name}",
-        "email": lead.email,
-        "company": lead.company,
-        "status": str(lead.status),
-        "source": str(lead.source),
-        "activities_count": len(lead.activities),
-        "emails_count": len(lead.emails),
-        "days_since_contact": days_since,
-        "deal_stage": deal_stage,
-        "deal_amount": deal_amount,
-    })
-    lead.score = score_data.get("score", lead.score)
-    lead.is_hot = str(score_data.get("is_hot", False)).lower()
-    lead.ai_next_action = score_data.get("next_action")
-    db.commit()
-    return score_data
+    hot = sum(1 for l in leads if str(l.is_hot).lower() == "true")
+    contacted = [l for l in leads if l.last_contacted_at]
+    avg_hours = 0.0
+    if contacted:
+        deltas = [(datetime.utcnow() - l.last_contacted_at).total_seconds() / 3600 for l in contacted]
+        avg_hours = sum(deltas) / len(deltas)
+    won = sum(1 for d in deals if str(d.stage) == "won")
+    win_rate = won / len(deals) if deals else 0
+
+    return get_pipeline_insights(len(leads), hot, stages, avg_hours, win_rate)
 
 
 @router.post("/score-all-leads")
 def score_all_leads(db: Session = Depends(get_db)):
-    """Batch score all leads"""
+    from app.models.lead import Lead
+    from app.ai.lead_scorer import score_lead
+    from datetime import datetime
     leads = db.query(Lead).all()
+    updated = 0
     for lead in leads:
-        days_since = 0
-        if lead.last_contacted_at:
-            days_since = (datetime.utcnow() - lead.last_contacted_at).days
-        score_data = score_lead({
+        data = {
             "name": f"{lead.first_name} {lead.last_name}",
-            "email": lead.email,
-            "company": lead.company,
-            "status": str(lead.status),
-            "source": str(lead.source),
+            "email": lead.email, "company": lead.company,
+            "status": str(lead.status), "source": str(lead.source),
             "activities_count": len(lead.activities),
             "emails_count": len(lead.emails),
-            "days_since_contact": days_since,
-        })
-        lead.score = score_data.get("score", 0)
-        lead.is_hot = str(score_data.get("is_hot", False)).lower()
-        lead.ai_next_action = score_data.get("next_action")
+            "days_since_contact": (datetime.utcnow() - lead.last_contacted_at).days if lead.last_contacted_at else 999,
+        }
+        result = score_lead(data)
+        lead.score = result.get("score", lead.score)
+        lead.is_hot = str(result.get("is_hot", False)).lower()
+        updated += 1
     db.commit()
-    return {"scored": len(leads), "message": "All leads scored"}
+    return {"updated": updated}
 
 
-@router.get("/pipeline-insights")
-def pipeline_insights_endpoint(db: Session = Depends(get_db)):
-    """Get AI-powered pipeline insights"""
-    total_leads = db.query(Lead).count()
-    hot_leads = db.query(Lead).filter(Lead.is_hot == "true").count()
-    deals = db.query(Deal).all()
-    stages: dict = {}
-    for deal in deals:
-        s = str(deal.stage)
-        stages[s] = stages.get(s, 0) + 1
-    won = stages.get("won", 0)
-    total_closed = won + stages.get("lost", 0)
-    win_rate = won / total_closed if total_closed > 0 else 0
-    insights = get_pipeline_insights(
-        total_leads=total_leads,
-        hot_leads=hot_leads,
-        deals_by_stage=stages,
-        avg_response_time_hours=8.0,  # TODO: calculate from activities
-        win_rate=win_rate,
-    )
-    return insights
+@router.post("/generate-followup")
+def generate_followup(data: dict, db: Session = Depends(get_db)):
+    from app.ai.reply_generator import generate_reply
+    return generate_reply(data)

@@ -135,3 +135,32 @@ class YeastarClient:
 
     def is_configured(self) -> bool:
         return bool(self.host and self.username and self.password)
+
+    async def get_recording_url(self, recording_file: str) -> Optional[str]:
+        """Return full URL to a CDR recording file"""
+        if not self.host or not recording_file:
+            return None
+        return f"{self.host}/api/v1.0.0/record/get_random?recording={recording_file}"
+
+    async def get_recent_cdrs(self, limit: int = 20) -> List[Dict]:
+        """Fetch recent CDRs with recording info for automated analysis"""
+        token = await self._get_token()
+        if not token:
+            return []
+        async with httpx.AsyncClient(verify=False) as client:
+            resp = await client.post(
+                f"{self.host}/api/v1.0.0/cdr/get_cdr",
+                json={"token": token, "pagesize": limit, "sortby": "desc"},
+            )
+            if resp.status_code == 200:
+                data = resp.json()
+                if data.get("status") == "Success":
+                    records = data.get("cdr_list", [])
+                    # Attach full recording_url to each record
+                    for r in records:
+                        rec_file = r.get("recording")
+                        if rec_file:
+                            r["recording_url"] = await self.get_recording_url(rec_file)
+                    return records
+        return []
+

@@ -185,3 +185,32 @@ class OutlookClient:
             IntegrationToken.service == "microsoft"
         ).first()
         return token is not None and token.access_token != ""
+
+    async def get_upcoming_events(self, hours_ahead: int = 24) -> list:
+        """Fetch upcoming calendar events from Microsoft Graph calendarView"""
+        access_token = await self._get_valid_token()
+        if not access_token:
+            return []
+
+        from datetime import timezone
+        now = datetime.now(timezone.utc)
+        end = now + timedelta(hours=hours_ahead)
+        start_str = now.strftime("%Y-%m-%dT%H:%M:%SZ")
+        end_str = end.strftime("%Y-%m-%dT%H:%M:%SZ")
+
+        async with httpx.AsyncClient() as client:
+            resp = await client.get(
+                f"{settings.MS_GRAPH_URL}/me/calendarView",
+                headers={"Authorization": f"Bearer {access_token}"},
+                params={
+                    "startDateTime": start_str,
+                    "endDateTime": end_str,
+                    "$select": "id,subject,start,end,attendees,bodyPreview,location",
+                    "$orderby": "start/dateTime",
+                    "$top": 10,
+                },
+            )
+            if resp.status_code == 200:
+                return resp.json().get("value", [])
+        return []
+
