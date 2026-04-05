@@ -3,18 +3,23 @@ import { useEffect, useState } from 'react'
 import Sidebar from '@/components/Sidebar'
 import { getEmails, suggestReply, sendReply, syncEmails, extractLead, sendEmail } from '@/lib/api'
 import { formatDistanceToNow } from 'date-fns'
+import { Mail, Edit3, RefreshCw, Zap, Search, AlertCircle, FileText, CheckCircle2 } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
 
 const DUMMY_EMAILS = [
-  { id: 'e1', from_address: 'sarah.chen@techcorp.io', subject: 'Re: Enterprise License Pricing', body_text: "Hi, I reviewed the proposal. The pricing looks good but I need to discuss the implementation timeline with my team. Can we schedule a call this week? Also, do you offer any flexibility on the setup fee?\n\nBest,\nSarah Chen\nVP of Operations, TechCorp Inc", direction: 'inbound', is_read: false, ai_summary: 'Sarah wants to discuss implementation timeline and is asking about setup fee flexibility. Warm and interested.', sentiment: 'positive', received_at: new Date(Date.now() - 3600000).toISOString() },
+  { id: 'e1', from_address: 'sarah.chen@techcorp.io', subject: 'Re: Enterprise License Pricing', body_text: "Hi, I reviewed the proposal. The pricing looks good but I need to discuss the implementation timeline with my team. Can we schedule a call this week? Also, do you offer any flexibility on the setup fee?", direction: 'inbound', is_read: false, ai_summary: 'Sarah wants to discuss implementation timeline and setup fee flexibility.', sentiment: 'positive', received_at: new Date(Date.now() - 3600000).toISOString() },
   { id: 'e2', from_address: 'aisha.d@scalex.ai', subject: 'Final approval pending board sign-off', body_text: "Great news! The board loved the demo. We're at the final approval stage. Expecting sign-off by Friday. Please prepare the final contract with the terms we agreed on last Tuesday.", direction: 'inbound', is_read: false, ai_summary: 'Board approved. Needs final contract by Friday. Hot deal — priority action.', sentiment: 'positive', received_at: new Date(Date.now() - 7200000).toISOString() },
   { id: 'e3', from_address: 'm.williams@finova.com', subject: 'Urgent: Contract Terms Review', body_text: "We've reviewed your contract terms. There are a few clauses regarding data privacy and SLA that our legal team has flagged. Can you clarify sections 4.2 and 7.1?", direction: 'inbound', is_read: false, ai_summary: 'Legal team flagged contract clauses 4.2 and 7.1. Urgent response needed.', sentiment: 'neutral', received_at: new Date(Date.now() - 14400000).toISOString() },
   { id: 'e4', from_address: 'dkim@nexacloud.com', subject: 'Interested in your platform', body_text: "Hello, I came across your platform and I'm very interested. We're a cloud startup looking for a CRM solution. Could you send me pricing info and schedule a quick demo?", direction: 'inbound', is_read: false, ai_summary: 'NexaCloud CEO interested in pricing and demo. New inbound lead.', sentiment: 'positive', received_at: new Date(Date.now() - 86400000).toISOString() },
-  { id: 'e5', from_address: 'emily.j@healthplus.org', subject: 'Question about enterprise features', body_text: "Hi there, We're a healthcare organization looking at your solution. Can you tell me more about your compliance certifications (HIPAA, SOC2) and how data is encrypted at rest?", direction: 'inbound', is_read: true, ai_summary: 'HealthPlus asking about HIPAA and SOC2 compliance — important for regulated industry.', sentiment: 'neutral', received_at: new Date(Date.now() - 172800000).toISOString() },
+  { id: 'e5', from_address: 'emily.j@healthplus.org', subject: 'Question about enterprise features', body_text: "Hi there, We're a healthcare organization looking at your solution. Can you tell me more about your compliance certifications (HIPAA, SOC2) and how data is encrypted at rest?", direction: 'inbound', is_read: true, ai_summary: 'HealthPlus asking about HIPAA and SOC2 compliance.', sentiment: 'neutral', received_at: new Date(Date.now() - 172800000).toISOString() },
 ]
 
-function SentimentDot({ s }: { s: string }) {
-  const c = s === 'positive' ? 'var(--success)' : s === 'negative' ? 'var(--danger)' : 'var(--warning)'
-  return <span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: c, marginRight: 4 }} />
+function SentimentIndicator({ s }: { s: string }) {
+  if (s === 'positive') return <div className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
+  if (s === 'negative') return <div className="w-2 h-2 rounded-full bg-red-400 shrink-0" />
+  return <div className="w-2 h-2 rounded-full bg-amber-400 shrink-0" />
 }
 
 export default function InboxPage() {
@@ -26,7 +31,6 @@ export default function InboxPage() {
   const [sending, setSending] = useState(false)
   const [syncing, setSyncing] = useState(false)
   const [extractedLead, setExtractedLead] = useState<any>(null)
-
   const [isComposing, setIsComposing] = useState(false)
   const [composeTo, setComposeTo] = useState('')
   const [composeSubject, setComposeSubject] = useState('')
@@ -36,11 +40,9 @@ export default function InboxPage() {
     getEmails().then((data: any) => { 
       if (Array.isArray(data) && data.length) {
         const normalized = data.map((e: any) => ({
-          ...e,
-          id: e.id || e.conversationId || Math.random().toString(),
+          ...e, id: e.id || e.conversationId || Math.random().toString(),
           from_address: e.from_address || e.from?.emailAddress?.address || 'unknown@example.com',
-          subject: e.subject || 'No Subject',
-          body_text: e.body_text || e.bodyPreview || '',
+          subject: e.subject || 'No Subject', body_text: e.body_text || e.bodyPreview || '',
           received_at: e.received_at || e.receivedDateTime || new Date().toISOString(),
           is_read: e.is_read !== undefined ? e.is_read : (e.isRead || false),
         }))
@@ -50,221 +52,233 @@ export default function InboxPage() {
   }, [])
 
   const handleSelect = (email: typeof DUMMY_EMAILS[0]) => {
-    setSelected(email)
-    setIsComposing(false)
-    setSuggestedReply('')
-    setReplyText('')
-    setExtractedLead(null)
-    if (!email.is_read) {
-      setEmails(prev => prev.map(e => e.id === email.id ? { ...e, is_read: true } : e))
-    }
+    setSelected(email); setIsComposing(false); setSuggestedReply(''); setReplyText(''); setExtractedLead(null)
+    if (!email.is_read) setEmails(prev => prev.map(e => e.id === email.id ? { ...e, is_read: true } : e))
   }
 
-  const handleCompose = () => {
-    setSelected(null)
-    setIsComposing(true)
-    setComposeTo('')
-    setComposeSubject('')
-    setComposeBody('')
-  }
+  const handleCompose = () => { setSelected(null); setIsComposing(true); setComposeTo(''); setComposeSubject(''); setComposeBody('') }
 
   const handleSendNew = async () => {
     if (!composeTo || !composeSubject || !composeBody) return alert('Please fill in all fields')
     setSending(true)
-    try {
-      await sendEmail({ to: composeTo, subject: composeSubject, body: composeBody })
-      alert('Email sent successfully!')
-      setIsComposing(false)
-    } catch {
-      alert('Failed to send email.')
-    }
+    try { await sendEmail({ to: composeTo, subject: composeSubject, body: composeBody }); alert('Sent successfully!'); setIsComposing(false) } catch { alert('Failed to send.') }
     setSending(false)
   }
 
   const handleSuggest = async () => {
-    if (!selected) return
-    setLoading(true)
+    if (!selected) return; setLoading(true)
     try {
       const data = await suggestReply(selected.id)
-      setSuggestedReply(data.suggested_reply)
-      setReplyText(data.suggested_reply)
+      setSuggestedReply(data.suggested_reply); setReplyText(data.suggested_reply)
     } catch {
-      const fallback = `Hi,\n\nThank you for your email regarding "${selected.subject}".\n\nI'd love to connect and discuss this further. Could we schedule a quick call this week?\n\nBest regards,\nSales Team`
-      setSuggestedReply(fallback)
-      setReplyText(fallback)
+      const fallback = `Hi,\n\nThank you for reaching out regarding "${selected.subject}".\n\nCould we schedule a quick call to discuss this further?\n\nBest regards,\nSales Team`
+      setSuggestedReply(fallback); setReplyText(fallback)
     }
     setLoading(false)
   }
 
   const handleSend = async () => {
-    if (!selected || !replyText) return
-    setSending(true)
-    try { await sendReply(selected.id, replyText) } catch {}
-    setSending(false)
-    setReplyText('')
-    setSuggestedReply('')
-    alert('Reply sent!')
+    if (!selected || !replyText) return; setSending(true)
+    try { await sendReply(selected.id, replyText); alert('Reply sent!') } catch {}
+    setSending(false); setReplyText(''); setSuggestedReply('')
   }
 
   const handleExtract = async () => {
-    if (!selected) return
-    setLoading(true)
+    if (!selected) return; setLoading(true)
     try {
       const data = await extractLead(selected.id)
-      setExtractedLead(data.extracted ? data.lead : { message: 'No lead detected in this email' })
+      setExtractedLead(data.extracted ? data.lead : { message: 'No exact lead format detected' })
     } catch {
-      setExtractedLead({ name: selected.from_address.split('@')[0], email: selected.from_address, company: selected.from_address.split('@')[1]?.split('.')[0] })
+      setExtractedLead({ name: selected.from_address.split('@')[0], email: selected.from_address })
     }
     setLoading(false)
   }
 
-  const handleSync = async () => {
-    setSyncing(true)
-    try { await syncEmails() } catch {}
-    setTimeout(() => setSyncing(false), 2000)
-  }
-
-  const unread = emails.filter(e => !e.is_read).length
+  const handleSync = async () => { setSyncing(true); try { await syncEmails() } catch {}; setTimeout(() => setSyncing(false), 2000) }
+  const unreadCount = emails.filter(e => !e.is_read).length
 
   return (
-    <div className="app-layout">
+    <div className="flex min-h-screen bg-slate-950 text-slate-50">
       <Sidebar />
-      <main className="main-content" style={{ padding: 0 }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '340px 1fr', height: '100vh' }}>
-
-          {/* Email list */}
-          <div style={{ borderRight: '1px solid var(--border)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-            <div style={{ padding: '20px 20px 14px', borderBottom: '1px solid var(--border)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-                <h2 style={{ fontSize: 18, fontWeight: 800 }}>📧 Inbox <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--accent)', marginLeft: 6 }}>{unread} unread</span></h2>
-                <div style={{ display: 'flex', gap: 6 }}>
-                  <button className="btn btn-primary btn-sm" onClick={handleCompose}>✏️ Compose</button>
-                  <button className="btn btn-ghost btn-sm" onClick={handleSync} disabled={syncing}>{syncing ? '⏳' : '🔄'}</button>
+      <main className="flex-1 ml-64 flex flex-col h-screen overflow-hidden">
+        
+        <div className="flex flex-1 overflow-hidden h-full">
+          {/* Email List Panel */}
+          <div className="w-[400px] shrink-0 border-r border-slate-800 flex flex-col bg-slate-900/50">
+            <div className="p-6 border-b border-slate-800 shrink-0">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <h1 className="text-2xl font-bold tracking-tight text-white flex items-center">
+                    Inbox <Badge className="ml-3 bg-[#D4AF37]/10 text-[#D4AF37] border-[#D4AF37]/20 pointer-events-none hover:bg-[#D4AF37]/10 text-xs px-2">{unreadCount} unread</Badge>
+                  </h1>
+                </div>
+                <div className="flex gap-2">
+                  <Button size="icon" variant="outline" className="border-slate-800 bg-slate-900 text-slate-400 hover:text-white shrink-0" onClick={handleSync} disabled={syncing}>
+                    <RefreshCw className={`w-4 h-4 ${syncing ? 'animate-spin' : ''}`} />
+                  </Button>
+                  <Button size="icon" className="bg-[#D4AF37] hover:bg-[#B8963E] text-slate-950 shrink-0" onClick={handleCompose}>
+                    <Edit3 className="w-4 h-4" />
+                  </Button>
                 </div>
               </div>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                <input className="w-full bg-slate-950 border border-slate-800 rounded-lg pl-9 pr-4 py-2 text-sm focus:outline-none focus:border-[#D4AF37]/50" placeholder="Search emails..." />
+              </div>
             </div>
-            <div style={{ overflowY: 'auto', flex: 1 }}>
+
+            <div className="flex-1 overflow-y-auto w-full">
               {emails.map(email => (
-                <div key={email.id} className={`email-item${!email.is_read ? ' unread' : ''}${selected?.id === email.id ? '' : ''}`}
-                  style={{ background: selected?.id === email.id ? 'rgba(99,102,241,0.08)' : undefined, borderLeft: selected?.id === email.id ? '3px solid var(--accent)' : '3px solid transparent' }}
-                  onClick={() => handleSelect(email)}>
-                  <div className="email-avatar" style={{ width: 38, height: 38, flexShrink: 0 }}>{email.from_address[0].toUpperCase()}</div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div className="email-subject" style={{ fontSize: 13, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{email.subject}</div>
-                    <div className="email-from" style={{ fontSize: 11 }}>{email.from_address}</div>
-                    {email.ai_summary && (
-                      <div style={{ fontSize: 11, color: 'var(--accent)', margin: '3px 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>💡 {email.ai_summary}</div>
-                    )}
-                  </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
-                    {!email.is_read && <span style={{ width: 8, height: 8, background: 'var(--accent)', borderRadius: '50%' }} />}
-                    {email.sentiment && <SentimentDot s={email.sentiment} />}
-                    <div className="email-time">{email.received_at ? formatDistanceToNow(new Date(email.received_at), { addSuffix: true }) : ''}</div>
+                <div key={email.id} onClick={() => handleSelect(email)}
+                  className={`p-4 border-b border-slate-800/50 cursor-pointer transition-colors ${selected?.id === email.id ? 'bg-[#D4AF37]/5 border-l-2 border-l-[#D4AF37]' : 'hover:bg-slate-800/30 border-l-2 border-l-transparent'} ${!email.is_read ? 'bg-slate-900' : ''}`}>
+                  <div className="flex items-start gap-3">
+                    <div className="w-9 h-9 rounded-full bg-slate-800 flex items-center justify-center font-bold text-sm text-[#D4AF37] shrink-0 border border-slate-700">
+                      {email.from_address?.charAt(0)?.toUpperCase()}
+                    </div>
+                    <div className="flex-1 min-w-0 pr-2">
+                      <div className="flex justify-between items-start mb-1 gap-2">
+                        <span className={`text-sm truncate ${email.is_read ? 'text-slate-300 font-medium' : 'text-slate-100 font-bold'}`}>{email.from_address}</span>
+                        <span className="text-[10px] text-slate-500 whitespace-nowrap">{email.received_at ? formatDistanceToNow(new Date(email.received_at)) : ''}</span>
+                      </div>
+                      <div className={`text-[13px] truncate mb-1.5 ${email.is_read ? 'text-slate-400' : 'text-slate-200 font-medium'}`}>{email.subject}</div>
+                      {email.ai_summary ? (
+                        <div className="text-[11px] text-[#D4AF37] flex items-start gap-1.5 mt-2 bg-slate-950 px-2 py-1.5 rounded-md border border-slate-800">
+                          <Zap className="w-3 h-3 shrink-0 mt-[1px]" />
+                          <span className="line-clamp-2 leading-relaxed opacity-90">{email.ai_summary}</span>
+                        </div>
+                      ) : (
+                        <div className="text-[12px] text-slate-500 line-clamp-1">{email.body_text}</div>
+                      )}
+                    </div>
+                    {!email.is_read && <div className="w-2 h-2 rounded-full bg-[#D4AF37] shrink-0 mt-1" />}
                   </div>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Email detail + AI panel */}
-          <div style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', background: isComposing ? 'var(--card-bg, #fff)' : undefined }}>
+          {/* Detailed Reading Pane */}
+          <div className="flex-1 flex flex-col overflow-hidden bg-slate-950 relative">
             {isComposing ? (
-              <div style={{ padding: '40px', maxWidth: 800 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-                  <h2 style={{ fontSize: 24, fontWeight: 800 }}>New Message</h2>
-                  <button className="btn btn-ghost btn-sm" onClick={() => setIsComposing(false)}>✖ Cancel</button>
+              <div className="p-10 max-w-3xl mx-auto w-full flex flex-col h-full overflow-y-auto">
+                <div className="flex items-center justify-between mb-8">
+                  <h2 className="text-2xl font-bold text-white">New Message</h2>
+                  <Button variant="ghost" onClick={() => setIsComposing(false)}>Cancel</Button>
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                  <div>
-                    <label className="form-label">To</label>
-                    <input className="form-input" placeholder="recipient@example.com" value={composeTo} onChange={e => setComposeTo(e.target.value)} />
-                  </div>
-                  <div>
-                    <label className="form-label">Subject</label>
-                    <input className="form-input" placeholder="Email subject..." value={composeSubject} onChange={e => setComposeSubject(e.target.value)} />
-                  </div>
-                  <div>
-                    <label className="form-label">Message</label>
-                    <textarea className="form-textarea" style={{ minHeight: 300, fontSize: 14 }} placeholder="Type your message here..." value={composeBody} onChange={e => setComposeBody(e.target.value)} />
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'flex-start', marginTop: 10 }}>
-                    <button className="btn btn-primary" onClick={handleSendNew} disabled={sending}>{sending ? 'Sending...' : '📤 Send Email'}</button>
+                <div className="space-y-4">
+                  <input className="w-full bg-slate-900 border border-slate-800 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-[#D4AF37]/50" placeholder="To: recipient@example.com" value={composeTo} onChange={e => setComposeTo(e.target.value)} />
+                  <input className="w-full bg-slate-900 border border-slate-800 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-[#D4AF37]/50" placeholder="Subject" value={composeSubject} onChange={e => setComposeSubject(e.target.value)} />
+                  <textarea className="w-full bg-slate-900 border border-slate-800 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-[#D4AF37]/50 min-h-[300px]" placeholder="Type your message here..." value={composeBody} onChange={e => setComposeBody(e.target.value)} />
+                  <div className="pt-2">
+                    <Button className="bg-[#D4AF37] text-slate-950 hover:bg-[#D4AF37]/90 px-8" onClick={handleSendNew} disabled={sending}>{sending ? 'Sending...' : 'Send Message'}</Button>
                   </div>
                 </div>
               </div>
             ) : selected ? (
-              <>
-                <div style={{ padding: '20px 28px', borderBottom: '1px solid var(--border)' }}>
-                  <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 6 }}>{selected.subject}</div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 13, color: 'var(--text-secondary)' }}>
-                    <span>From: <strong>{selected.from_address}</strong></span>
-                    <span>·</span>
-                    <span>{selected.received_at ? formatDistanceToNow(new Date(selected.received_at), { addSuffix: true }) : ''}</span>
+              <div className="flex flex-1 overflow-hidden h-full">
+                <div className="flex-1 flex flex-col overflow-y-auto p-8 border-r border-slate-800/60 custom-scrollbar">
+                  {/* Email Header */}
+                  <div className="mb-8">
+                    <h2 className="text-xl md:text-2xl font-bold text-white mb-4 leading-snug">{selected.subject}</h2>
+                    <div className="flex items-center justify-between border-b border-slate-800/80 pb-6">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center font-bold text-sm text-[#D4AF37] shrink-0">
+                          {selected.from_address?.charAt(0)?.toUpperCase()}
+                        </div>
+                        <div>
+                          <div className="text-sm font-semibold text-slate-200">{selected.from_address}</div>
+                          <div className="text-xs text-slate-500">{selected.received_at ? formatDistanceToNow(new Date(selected.received_at), { addSuffix: true }) : ''}</div>
+                        </div>
+                      </div>
+                      {selected.sentiment && (
+                        <Badge variant="outline" className="border-slate-800 bg-slate-900 gap-1.5 font-medium uppercase tracking-wider text-[10px]">
+                          <SentimentIndicator s={selected.sentiment} /> {selected.sentiment}
+                        </Badge>
+                      )}
+                    </div>
                   </div>
+
+                  {/* Body Content */}
+                  <div className="text-[14px] leading-relaxed text-slate-300 whitespace-pre-wrap mb-10 selection:bg-[#D4AF37]/30">
+                    {selected.body_text}
+                  </div>
+
+                  {/* Reply Action */}
+                  <div className="mt-auto border-t border-slate-800 pt-6">
+                    <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Compose Reply</h3>
+                    <textarea 
+                      className="w-full bg-slate-900 border border-slate-800 rounded-lg px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-[#D4AF37]/50 min-h-[140px] mb-4 placeholder:text-slate-600" 
+                      placeholder="Type your reply here..." 
+                      value={replyText} 
+                      onChange={e => setReplyText(e.target.value)} 
+                    />
+                    <div className="flex gap-3">
+                      <Button className="bg-[#D4AF37] text-slate-950 hover:bg-[#D4AF37]/90 px-6" onClick={handleSend} disabled={!replyText || sending}>{sending ? 'Sending...' : 'Send Reply'}</Button>
+                      <Button variant="outline" className="border-slate-700 bg-slate-900 text-slate-300" onClick={handleSuggest} disabled={loading}>
+                        {loading ? 'Thinking...' : <><Zap className="w-4 h-4 mr-2" /> Auto-Draft AI Reply</>}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* AI Assistant Right Sidebar */}
+                <div className="w-[320px] bg-slate-950 p-6 overflow-y-auto flex flex-col gap-6 shrink-0 custom-scrollbar">
+                  <div className="text-[10px] font-bold text-[#D4AF37] uppercase tracking-widest flex items-center gap-2 mb-2">
+                    <Bot className="w-3.5 h-3.5" /> Sales Co-worker
+                  </div>
+
+                  {/* AI Summary Card */}
                   {selected.ai_summary && (
-                    <div style={{ marginTop: 10, padding: '10px 14px', background: 'rgba(99,102,241,0.08)', border: '1px solid rgba(99,102,241,0.2)', borderRadius: 8, fontSize: 13, color: 'var(--accent)' }}>
-                      💡 <strong>AI Summary:</strong> {selected.ai_summary}
+                    <div className="bg-indigo-500/5 border border-indigo-500/20 rounded-xl p-4">
+                      <h3 className="text-xs font-bold text-indigo-400 uppercase tracking-wider mb-2 flex items-center gap-1.5"><FileText className="w-3.5 h-3.5" /> Intel</h3>
+                      <p className="text-[13px] text-indigo-200/80 leading-relaxed">{selected.ai_summary}</p>
                     </div>
                   )}
-                </div>
 
-                <div style={{ flex: 1, overflowY: 'auto', padding: '20px 28px', display: 'grid', gridTemplateColumns: '1fr 380px', gap: 20 }}>
-
-                  {/* Email body */}
-                  <div>
-                    <div style={{ whiteSpace: 'pre-wrap', fontSize: 14, lineHeight: 1.7, color: 'var(--text-secondary)', marginBottom: 20 }}>
-                      {selected.body_text}
+                  {/* Generated Suggested Reply */}
+                  {suggestedReply && (
+                    <div className="bg-[#D4AF37]/5 border border-[#D4AF37]/30 rounded-xl p-4">
+                      <h3 className="text-xs font-bold text-[#D4AF37] uppercase tracking-wider mb-3 flex items-center gap-1.5"><Zap className="w-3.5 h-3.5" /> Draft Ready</h3>
+                      <p className="text-[12px] text-slate-300 leading-relaxed italic border-l-2 border-[#D4AF37]/50 pl-3 mb-4 line-clamp-6">{suggestedReply}</p>
+                      <Button variant="outline" size="sm" className="w-full border-[#D4AF37]/50 text-[#D4AF37] hover:bg-[#D4AF37]/10" onClick={() => setReplyText(suggestedReply)}>Apply Draft</Button>
                     </div>
+                  )}
 
-                    {/* Reply */}
-                    <div style={{ marginTop: 10 }}>
-                      <label className="form-label">✏️ Your Reply</label>
-                      <textarea className="form-textarea" style={{ minHeight: 140 }} placeholder="Type your reply…" value={replyText} onChange={e => setReplyText(e.target.value)} />
-                      <div style={{ display: 'flex', gap: 10, marginTop: 10 }}>
-                        <button className="btn btn-primary" onClick={handleSend} disabled={!replyText || sending}>{sending ? 'Sending…' : '📤 Send Reply'}</button>
-                        <button className="btn btn-ghost" onClick={handleSuggest} disabled={loading}>{loading ? '⏳ Generating…' : '⚡ AI Suggest Reply'}</button>
-                        <button className="btn btn-ghost" onClick={handleExtract} disabled={loading}>🔍 Extract Lead</button>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* AI Sidebar */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                    {suggestedReply && (
-                      <div className="ai-panel">
-                        <div className="ai-panel-header">⚡ AI Suggested Reply</div>
-                        <div style={{ fontSize: 13, color: 'var(--text-secondary)', whiteSpace: 'pre-wrap', lineHeight: 1.6, marginBottom: 12 }}>{suggestedReply}</div>
-                        <button className="btn btn-primary btn-sm" onClick={() => setReplyText(suggestedReply)}>Use This Reply</button>
-                      </div>
-                    )}
-                    {extractedLead && (
-                      <div className="ai-panel" style={{ border: '1px solid rgba(16,185,129,0.2)', background: 'rgba(16,185,129,0.05)' }}>
-                        <div className="ai-panel-header" style={{ color: 'var(--success)' }}>🎯 Lead Extracted</div>
+                  {/* Extracted Lead Output */}
+                  {extractedLead && (
+                    <div className="bg-emerald-500/5 border border-emerald-500/30 rounded-xl p-4">
+                      <h3 className="text-xs font-bold text-emerald-500 uppercase tracking-wider mb-3 flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5" /> Lead Extracted</h3>
+                      <div className="space-y-2 mb-4">
                         {Object.entries(extractedLead).map(([k, v]) => (
-                          <div key={k} style={{ fontSize: 13, marginBottom: 4 }}>
-                            <span style={{ color: 'var(--text-muted)', textTransform: 'capitalize' }}>{k}: </span>
-                            <span style={{ color: 'var(--text-primary)' }}>{String(v)}</span>
+                          <div key={k} className="flex flex-col">
+                            <span className="text-[10px] uppercase text-slate-500 font-bold">{k}</span>
+                            <span className="text-xs text-slate-200 truncate">{String(v)}</span>
                           </div>
                         ))}
-                        <button className="btn btn-primary btn-sm" style={{ marginTop: 10 }} onClick={() => window.location.href = '/leads'}>Add to Leads</button>
                       </div>
-                    )}
-                    <div className="card">
-                      <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 10 }}>⚡ Quick Actions</div>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                        <button className="btn btn-ghost" style={{ justifyContent: 'flex-start', fontSize: 13 }} onClick={handleSuggest}>🤖 Generate AI Reply</button>
-                        <button className="btn btn-ghost" style={{ justifyContent: 'flex-start', fontSize: 13 }} onClick={handleExtract}>🔍 Extract Lead Info</button>
-                        <button className="btn btn-ghost" style={{ justifyContent: 'flex-start', fontSize: 13 }} onClick={() => window.location.href = '/reminders'}>🔔 Set Reminder</button>
-                      </div>
+                      <Button className="w-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/50 hover:bg-emerald-500/30" onClick={() => window.location.href = '/leads'} size="sm">Add to CRM</Button>
+                    </div>
+                  )}
+
+                  {/* Quick Toolbox */}
+                  <div className="mt-auto pt-6 border-t border-slate-800">
+                    <h3 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-3">Toolbox</h3>
+                    <div className="space-y-2">
+                      <Button variant="ghost" size="sm" className="w-full justify-start text-xs text-slate-400 hover:text-white" onClick={handleSuggest}>
+                        <Zap className="mr-2 w-3.5 h-3.5" /> Generate AI Reply
+                      </Button>
+                      <Button variant="ghost" size="sm" className="w-full justify-start text-xs text-slate-400 hover:text-white" onClick={handleExtract}>
+                        <Search className="mr-2 w-3.5 h-3.5" /> Parse Lead Data
+                      </Button>
                     </div>
                   </div>
                 </div>
-              </>
+              </div>
             ) : (
-              <div className="empty-state" style={{ height: '100%' }}>
-                <div className="empty-icon">📧</div>
-                <div className="empty-text">Select an email</div>
-                <div className="empty-sub">Click an email to read it and get AI suggestions</div>
+              <div className="flex-1 flex flex-col items-center justify-center p-12 text-center bg-slate-950">
+                <Mail className="w-16 h-16 text-slate-800 mb-6" />
+                <h3 className="text-xl font-bold text-white mb-2">Your Sales Inbox</h3>
+                <p className="text-slate-500 text-sm max-w-xs">Select an email from the list to read it, generate AI drafts, and automatically extract pipeline leads.</p>
               </div>
             )}
           </div>
@@ -272,4 +286,8 @@ export default function InboxPage() {
       </main>
     </div>
   )
+}
+
+function Bot(props: any) {
+  return <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
 }
