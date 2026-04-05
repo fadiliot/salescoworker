@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import Sidebar from '@/components/Sidebar'
+import StakeholderMap from '@/components/StakeholderMap'
 import { getDeals, updateDealStage, createDeal } from '@/lib/api'
 
 const STAGES = [
@@ -13,22 +14,37 @@ const STAGES = [
 ]
 
 const DUMMY_DEALS = [
-  { id: '1', title: 'TechCorp Enterprise License', stage: 'proposal', amount: '45000', currency: 'USD', probability: '70', notes: 'Discussing implementation timeline' },
-  { id: '2', title: 'Finova Capital Integration Suite', stage: 'negotiation', amount: '120000', currency: 'USD', probability: '85', notes: 'Legal reviewing contract clauses' },
-  { id: '3', title: 'GrowthLab Starter Package', stage: 'contacted', amount: '8500', currency: 'USD', probability: '40', notes: 'Initial interest shown' },
-  { id: '4', title: 'ScaleX AI Platform Deal', stage: 'negotiation', amount: '95000', currency: 'USD', probability: '90', notes: 'Board sign-off pending this Friday' },
-  { id: '5', title: 'Movie Productions Media Suite', stage: 'won', amount: '22000', currency: 'USD', probability: '100', notes: 'Contract signed!' },
-  { id: '6', title: 'AutoHaus CRM Deal', stage: 'new', amount: '18000', currency: 'USD', probability: '20', notes: 'Early exploratory stage' },
-  { id: '7', title: 'NexaCloud Annual Contract', stage: 'proposal', amount: '62000', currency: 'USD', probability: '65', notes: 'Personalised proposal sent' },
-  { id: '8', title: 'RetailMax POS Integration', stage: 'contacted', amount: '15000', currency: 'USD', probability: '35', notes: 'Demo scheduled' },
+  { id: '1', title: 'Al Habtoor Group — CRM Suite', stage: 'proposal', amount: '165000', currency: 'AED', probability: '70', notes: 'Discussing implementation timeline', lead_id: '1' },
+  { id: '2', title: 'Emirates NBD — Integration Platform', stage: 'negotiation', amount: '440000', currency: 'AED', probability: '85', notes: 'Legal reviewing contract clauses', lead_id: '2' },
+  { id: '3', title: 'Damac Properties — Lead Mgmt', stage: 'contacted', amount: '31000', currency: 'AED', probability: '40', notes: 'Initial interest shown', lead_id: '3' },
+  { id: '4', title: 'Majid Al Futtaim — AI Platform', stage: 'negotiation', amount: '349000', currency: 'AED', probability: '90', notes: 'Board sign-off pending this Friday', lead_id: '4' },
+  { id: '5', title: 'Dubai Holding — SaaS Bundle', stage: 'won', amount: '80000', currency: 'AED', probability: '100', notes: 'Contract signed!', lead_id: '5' },
+  { id: '6', title: 'ADNOC Digital — Workflow Tool', stage: 'new', amount: '66000', currency: 'AED', probability: '20', notes: 'Early exploratory stage', lead_id: '6' },
 ]
+
+const DUMMY_CONTACTS: Record<string, any[]> = {
+  '1': [
+    { id: 'c1', first_name: 'Khalid', last_name: 'Al Habtoor', title: 'Group CEO', email: 'k.habtoor@alhabtoor.ae', role_type: 'Economic Buyer' },
+    { id: 'c2', first_name: 'Sara', last_name: 'Al Mansoori', title: 'IT Director', email: 'sara.m@alhabtoor.ae', role_type: 'Champion' },
+  ],
+  '2': [
+    { id: 'c3', first_name: 'Mohammed', last_name: 'Al Gergawi', title: 'SVP Technology', email: 'm.gergawi@emiratesnbd.com', role_type: 'Economic Buyer' },
+    { id: 'c4', first_name: 'Fatima', last_name: 'Al Rashidi', title: 'Procurement Manager', email: 'fatima.r@emiratesnbd.com', role_type: 'Gatekeeper' },
+    { id: 'c5', first_name: 'Rania', last_name: 'Khouri', title: 'Legal Counsel', email: 'r.khouri@emiratesnbd.com', role_type: 'Legal' },
+  ],
+  '4': [
+    { id: 'c6', first_name: 'Alain', last_name: 'Bejjani', title: 'Group CEO', email: 'a.bejjani@maf.ae', role_type: 'Economic Buyer' },
+    { id: 'c7', first_name: 'Nour', last_name: 'Saleh', title: 'Head of Innovation', email: 'n.saleh@maf.ae', role_type: 'Evaluator' },
+  ],
+}
 
 export default function PipelinePage() {
   const [deals, setDeals] = useState(DUMMY_DEALS)
   const [dragging, setDragging] = useState<string | null>(null)
   const [dragOver, setDragOver] = useState<string | null>(null)
   const [showForm, setShowForm] = useState(false)
-  const [form, setForm] = useState({ title: '', stage: 'new', amount: '', currency: 'USD', probability: '', notes: '' })
+  const [selectedDeal, setSelectedDeal] = useState<any | null>(null)
+  const [form, setForm] = useState({ title: '', stage: 'new', amount: '', currency: 'AED', probability: '', notes: '' })
 
   useEffect(() => {
     getDeals().then((data: any) => { if (Array.isArray(data) && data.length) setDeals(data) }).catch(() => {})
@@ -55,8 +71,10 @@ export default function PipelinePage() {
       setDeals(prev => [...prev, { id: Date.now().toString(), ...form } as any])
     }
     setShowForm(false)
-    setForm({ title: '', stage: 'new', amount: '', currency: 'USD', probability: '', notes: '' })
+    setForm({ title: '', stage: 'new', amount: '', currency: 'AED', probability: '', notes: '' })
   }
+
+  const stageColor = (stage: string) => STAGES.find(s => s.key === stage)?.color || 'var(--accent)'
 
   return (
     <div className="app-layout">
@@ -65,7 +83,7 @@ export default function PipelinePage() {
         <div className="page-header">
           <div>
             <h1 className="page-title">Pipeline</h1>
-            <p className="page-subtitle">${totalPipeline.toLocaleString()} total pipeline · ${wonValue.toLocaleString()} won</p>
+            <p className="page-subtitle">AED {totalPipeline.toLocaleString()} total · AED {wonValue.toLocaleString()} won</p>
           </div>
           <button className="btn btn-primary" onClick={() => setShowForm(true)}>+ New Deal</button>
         </div>
@@ -79,7 +97,7 @@ export default function PipelinePage() {
               <div key={s.key} className="card" style={{ padding: '14px 16px', borderTop: `2px solid ${s.color}` }}>
                 <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 6 }}>{s.label}</div>
                 <div style={{ fontSize: 22, fontWeight: 800 }}>{stageDeals.length}</div>
-                <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>${val.toLocaleString()}</div>
+                <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>AED {val.toLocaleString()}</div>
               </div>
             )
           })}
@@ -101,7 +119,7 @@ export default function PipelinePage() {
                   onDragStart={() => handleDragStart(deal.id)}
                   onDragEnd={() => { setDragging(null); setDragOver(null) }}>
                   <div className="deal-title">{deal.title}</div>
-                  <div className="deal-amount">${parseFloat(deal.amount || '0').toLocaleString()}</div>
+                  <div className="deal-amount">AED {parseFloat(deal.amount || '0').toLocaleString()}</div>
                   <div className="deal-meta">
                     {deal.probability && <span>🎯 {deal.probability}% probability</span>}
                   </div>
@@ -110,7 +128,16 @@ export default function PipelinePage() {
                       {deal.notes}
                     </div>
                   )}
-                  <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 8 }}>⋮ Drag to move stage</div>
+                  {/* Stakeholder peek */}
+                  <button
+                    onClick={e => { e.stopPropagation(); setSelectedDeal(deal) }}
+                    style={{
+                      marginTop: 10, width: '100%', padding: '5px', borderRadius: 6, fontSize: 11,
+                      background: 'rgba(212,175,55,0.08)', border: '1px solid rgba(212,175,55,0.2)',
+                      color: '#D4AF37', cursor: 'pointer', fontWeight: 600,
+                    }}>
+                    👥 View Stakeholders
+                  </button>
                 </div>
               ))}
               {dealsByStage(stage.key).length === 0 && (
@@ -122,14 +149,54 @@ export default function PipelinePage() {
           ))}
         </div>
 
+        {/* Stakeholder Map Panel */}
+        {selectedDeal && (
+          <div style={{
+            position: 'fixed', inset: 0, zIndex: 1000,
+            background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(4px)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20,
+          }} onClick={() => setSelectedDeal(null)}>
+            <div style={{
+              background: 'var(--bg-secondary)', borderRadius: 16, padding: '28px 32px',
+              maxWidth: 640, width: '100%', maxHeight: '80vh', overflowY: 'auto',
+              border: '1px solid rgba(212,175,55,0.2)',
+              boxShadow: '0 24px 80px rgba(0,0,0,0.5)',
+            }} onClick={e => e.stopPropagation()}>
+              {/* Header */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
+                <div>
+                  <div style={{ fontSize: 11, color: '#D4AF37', fontWeight: 700, letterSpacing: 1, marginBottom: 4 }}>STAKEHOLDER MAP</div>
+                  <div style={{ fontSize: 17, fontWeight: 800 }}>{selectedDeal.title}</div>
+                  <div style={{ display: 'flex', gap: 8, marginTop: 6, alignItems: 'center' }}>
+                    <span style={{ fontSize: 12, color: stageColor(selectedDeal.stage), fontWeight: 600, padding: '2px 10px', borderRadius: 20, background: `${stageColor(selectedDeal.stage)}18`, border: `1px solid ${stageColor(selectedDeal.stage)}30` }}>
+                      {selectedDeal.stage}
+                    </span>
+                    <span style={{ fontSize: 12, color: '#D4AF37', fontWeight: 600 }}>AED {parseFloat(selectedDeal.amount || '0').toLocaleString()}</span>
+                  </div>
+                </div>
+                <button onClick={() => setSelectedDeal(null)} style={{ background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: 'var(--text-muted)', lineHeight: 1 }}>✕</button>
+              </div>
+
+              <StakeholderMap
+                contacts={DUMMY_CONTACTS[selectedDeal.id] || []}
+                dealStage={selectedDeal.stage}
+                onRoleChange={(contactId, role) => {
+                  console.log(`Contact ${contactId} role updated to ${role}`)
+                  // TODO: persist via API /api/contacts/{id}/role
+                }}
+              />
+            </div>
+          </div>
+        )}
+
         {/* Add Deal Modal */}
         {showForm && (
           <div className="modal-overlay" onClick={e => { if (e.target === e.currentTarget) setShowForm(false) }}>
             <div className="modal">
               <div className="modal-title">Create New Deal</div>
-              <div className="form-group"><label className="form-label">Deal Title *</label><input className="form-input" placeholder="e.g. Acme Corp - Enterprise" value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} /></div>
+              <div className="form-group"><label className="form-label">Deal Title *</label><input className="form-input" placeholder="e.g. Al Habtoor Group — Enterprise" value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} /></div>
               <div className="two-col">
-                <div className="form-group"><label className="form-label">Amount (USD)</label><input className="form-input" type="number" placeholder="50000" value={form.amount} onChange={e => setForm(f => ({ ...f, amount: e.target.value }))} /></div>
+                <div className="form-group"><label className="form-label">Amount (AED)</label><input className="form-input" type="number" placeholder="50000" value={form.amount} onChange={e => setForm(f => ({ ...f, amount: e.target.value }))} /></div>
                 <div className="form-group"><label className="form-label">Probability %</label><input className="form-input" type="number" placeholder="70" value={form.probability} onChange={e => setForm(f => ({ ...f, probability: e.target.value }))} /></div>
               </div>
               <div className="form-group">
