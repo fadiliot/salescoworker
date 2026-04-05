@@ -33,7 +33,20 @@ export default function InboxPage() {
   const [composeBody, setComposeBody] = useState('')
 
   useEffect(() => {
-    getEmails().then((data: any) => { if (Array.isArray(data) && data.length) setEmails(data) }).catch(() => {})
+    getEmails().then((data: any) => { 
+      if (Array.isArray(data) && data.length) {
+        const normalized = data.map((e: any) => ({
+          ...e,
+          id: e.id || e.conversationId || Math.random().toString(),
+          from_address: e.from_address || e.from?.emailAddress?.address || 'unknown@example.com',
+          subject: e.subject || 'No Subject',
+          body_text: e.body_text || e.bodyPreview || '',
+          received_at: e.received_at || e.receivedDateTime || new Date().toISOString(),
+          is_read: e.is_read !== undefined ? e.is_read : (e.isRead || false),
+        }))
+        setEmails(normalized)
+      }
+    }).catch(() => {})
   }, [])
 
   const handleSelect = (email: typeof DUMMY_EMAILS[0]) => {
