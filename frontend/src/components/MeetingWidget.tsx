@@ -1,6 +1,11 @@
 'use client'
 import { useState } from 'react'
 import API from '@/lib/api'
+import { Calendar as CalendarIcon, Clock, X, Zap, Loader2 } from 'lucide-react'
+import { Card, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Badge } from '@/components/ui/badge'
 
 interface Attendee {
   emailAddress: { address: string; name?: string }
@@ -53,116 +58,94 @@ export default function MeetingWidget({ events }: MeetingWidgetProps) {
     setLoading(false)
   }
 
-  const closeModal = () => { setActiveMeeting(null); setBrief([]) }
-
   if (!events.length) {
     return (
-      <div style={{ padding: '20px', textAlign: 'center', color: 'var(--text-muted)', fontSize: 13 }}>
-        📅 No upcoming meetings in the next 48 hours.
+      <div className="py-6 text-center text-slate-500 text-[13px] bg-slate-900 rounded-lg border border-dashed border-slate-700">
+        <CalendarIcon className="w-6 h-6 mx-auto mb-2 opacity-30" />
+        No upcoming meetings in the next 48 hours.
       </div>
     )
   }
 
   return (
     <>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <div className="flex flex-col gap-2">
         {events.map(ev => (
           <div key={ev.id}
             onClick={() => handleFetchBrief(ev)}
-            style={{
-              padding: '10px 14px', borderRadius: 10, cursor: 'pointer',
-              background: 'var(--bg-glass)',
-              border: '1px solid var(--border)',
-              transition: 'all 0.2s',
-            }}
-            onMouseEnter={e => (e.currentTarget.style.borderColor = 'var(--accent)')}
-            onMouseLeave={e => (e.currentTarget.style.borderColor = 'var(--border)')}
+            className="group flex items-start justify-between p-3 rounded-xl bg-slate-950/50 border border-slate-800 hover:border-[#D4AF37]/50 hover:bg-slate-900 transition-all cursor-pointer shadow-sm"
           >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {ev.subject}
-                </div>
-                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
-                  {fmtDate(ev.start.dateTime)} • {fmt(ev.start.dateTime)} – {fmt(ev.end.dateTime)}
-                  {ev.location?.displayName ? ` • ${ev.location.displayName}` : ''}
-                </div>
+            <div className="flex-1 min-w-0 pr-3">
+              <div className="text-[13px] font-bold text-slate-200 group-hover:text-white truncate transition-colors">
+                {ev.subject}
               </div>
-              <span style={{
-                fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 20,
-                background: 'rgba(212,175,55,0.12)', color: '#D4AF37', marginLeft: 8, flexShrink: 0
-              }}>
-                ⚡ Brief
-              </span>
+              <div className="text-[11px] text-slate-500 mt-1 flex items-center gap-2">
+                <span className="flex items-center gap-1"><CalendarIcon className="w-3 h-3" /> {fmtDate(ev.start.dateTime)}</span>
+                <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {fmt(ev.start.dateTime)} – {fmt(ev.end.dateTime)}</span>
+              </div>
             </div>
+            
+            <Badge variant="outline" className="shrink-0 bg-[#D4AF37]/10 text-[#D4AF37] border-[#D4AF37]/30 px-2 py-0 h-6 text-[10px] font-bold tracking-wider rounded-md group-hover:bg-[#D4AF37]/20 transition-colors">
+              <Zap className="w-3 h-3 mr-1" /> Brief
+            </Badge>
           </div>
         ))}
       </div>
 
-      {/* Tear Sheet Modal */}
-      {activeMeeting && (
-        <div style={{
-          position: 'fixed', inset: 0, zIndex: 1000,
-          background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(4px)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20,
-        }}
-          onClick={closeModal}
-        >
-          <div
-            style={{
-              background: 'var(--bg-secondary)', borderRadius: 16, padding: '28px 32px',
-              maxWidth: 520, width: '100%', border: '1px solid rgba(212,175,55,0.25)',
-              boxShadow: '0 24px 80px rgba(0,0,0,0.5)',
-            }}
-            onClick={e => e.stopPropagation()}
-          >
-            {/* Header */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
-              <div>
-                <div style={{ fontSize: 11, color: '#D4AF37', fontWeight: 700, letterSpacing: 1, marginBottom: 4 }}>PRE-MEETING BRIEF</div>
-                <div style={{ fontSize: 17, fontWeight: 800 }}>{activeMeeting.subject}</div>
-                <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4 }}>
-                  {fmtDate(activeMeeting.start.dateTime)} • {fmt(activeMeeting.start.dateTime)}
+      <Dialog open={!!activeMeeting} onOpenChange={(open) => !open && setActiveMeeting(null)}>
+         <DialogContent className="sm:max-w-[550px] bg-slate-950 border border-[#D4AF37]/30 shadow-[0_24px_80px_rgba(0,0,0,0.5)] p-0 overflow-hidden text-left">
+           {activeMeeting && (
+             <>
+              <div className="p-6 border-b border-slate-800 bg-slate-900/50 relative">
+                <div className="text-[10px] text-[#D4AF37] font-bold tracking-[0.2em] mb-1.5 flex items-center gap-2">
+                  <Zap className="w-3 h-3" fill="currentColor" /> AI PRE-MEETING TEAR SHEET
                 </div>
-              </div>
-              <button onClick={closeModal} style={{ background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: 'var(--text-muted)', lineHeight: 1 }}>✕</button>
-            </div>
-
-            {/* Attendees */}
-            {activeMeeting.attendees && activeMeeting.attendees.length > 0 && (
-              <div style={{ marginBottom: 16, display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                {activeMeeting.attendees.slice(0, 5).map((a: Attendee, i: number) => (
-                  <span key={i} style={{
-                    fontSize: 11, padding: '3px 10px', borderRadius: 20,
-                    background: 'rgba(59,130,246,0.1)', color: '#3B82F6', border: '1px solid rgba(59,130,246,0.2)'
-                  }}>
-                    {a.emailAddress?.name || a.emailAddress?.address}
-                  </span>
-                ))}
-              </div>
-            )}
-
-            {/* Brief bullets */}
-            <div style={{ borderTop: '1px solid var(--border)', paddingTop: 16 }}>
-              {loading ? (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: 'var(--text-muted)', fontSize: 13 }}>
-                  <div style={{ width: 16, height: 16, border: '2px solid #D4AF37', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
-                  Generating AI brief...
+                <DialogTitle className="text-xl md:text-2xl font-bold text-white mb-2 leading-tight pr-8">
+                  {activeMeeting.subject}
+                </DialogTitle>
+                <div className="flex flex-wrap items-center gap-3 text-[12px] text-slate-400 font-medium">
+                  <div className="flex items-center gap-1.5"><CalendarIcon className="w-3.5 h-3.5" /> {fmtDate(activeMeeting.start.dateTime)}</div>
+                  <div className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" /> {fmt(activeMeeting.start.dateTime)} – {fmt(activeMeeting.end.dateTime)}</div>
                 </div>
-              ) : (
-                <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 10 }}>
-                  {brief.map((bullet, i) => (
-                    <li key={i} style={{ display: 'flex', gap: 10, fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-                      <span style={{ color: '#D4AF37', fontWeight: 800, fontSize: 15, lineHeight: 1.3 }}>{i + 1}.</span>
-                      {bullet}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+
+                {/* Attendees */}
+                {activeMeeting.attendees && activeMeeting.attendees.length > 0 && (
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {activeMeeting.attendees.slice(0, 5).map((a: Attendee, i: number) => (
+                      <Badge key={i} variant="secondary" className="bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 text-[10px]">
+                        {a.emailAddress?.name || a.emailAddress?.address}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="p-6 bg-slate-950 max-h-[50vh] overflow-y-auto">
+                {loading ? (
+                   <div className="flex flex-col flex-1 items-center justify-center py-8 text-slate-400">
+                     <Loader2 className="h-8 w-8 animate-spin text-[#D4AF37] mb-4" />
+                     <p className="text-sm font-medium tracking-wide">Generating executive brief...</p>
+                     <p className="text-xs text-slate-500 mt-1">Analyzing recent emails and deals</p>
+                   </div>
+                ) : (
+                  <div className="space-y-4">
+                    {brief.map((bullet, i) => (
+                      <div key={i} className="flex gap-4">
+                        <div className="shrink-0 w-6 h-6 rounded-full bg-[#D4AF37]/10 flex items-center justify-center border border-[#D4AF37]/30">
+                          <span className="text-[#D4AF37] font-black text-xs">{i + 1}</span>
+                        </div>
+                        <p className="text-[13px] leading-relaxed text-slate-300 pt-0.5">
+                          {bullet}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+             </>
+           )}
+         </DialogContent>
+      </Dialog>
     </>
   )
 }

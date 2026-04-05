@@ -3,14 +3,18 @@ import { useEffect, useState } from 'react'
 import Sidebar from '@/components/Sidebar'
 import StakeholderMap from '@/components/StakeholderMap'
 import { getDeals, updateDealStage, createDeal } from '@/lib/api'
+import { Plus, Users, LayoutList, Target, CircleDollarSign } from 'lucide-react'
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
 
 const STAGES = [
-  { key: 'new', label: 'New', color: '#6366f1' },
-  { key: 'contacted', label: 'Contacted', color: '#60a5fa' },
-  { key: 'proposal', label: 'Proposal', color: '#c084fc' },
-  { key: 'negotiation', label: 'Negotiation', color: '#f97316' },
-  { key: 'won', label: 'Won 🎉', color: '#10b981' },
-  { key: 'lost', label: 'Lost', color: '#ef4444' },
+  { key: 'new', label: 'New', color: 'border-blue-500', bg: 'bg-blue-500/10', text: 'text-blue-500' },
+  { key: 'contacted', label: 'Contacted', color: 'border-cyan-500', bg: 'bg-cyan-500/10', text: 'text-cyan-500' },
+  { key: 'proposal', label: 'Proposal', color: 'border-purple-500', bg: 'bg-purple-500/10', text: 'text-purple-500' },
+  { key: 'negotiation', label: 'Negotiation', color: 'border-orange-500', bg: 'bg-orange-500/10', text: 'text-orange-500' },
+  { key: 'won', label: 'Won 🎉', color: 'border-emerald-500', bg: 'bg-emerald-500/10', text: 'text-emerald-500' },
+  { key: 'lost', label: 'Lost', color: 'border-red-500', bg: 'bg-red-500/10', text: 'text-red-500' },
 ]
 
 const DUMMY_DEALS = [
@@ -74,143 +78,187 @@ export default function PipelinePage() {
     setForm({ title: '', stage: 'new', amount: '', currency: 'AED', probability: '', notes: '' })
   }
 
-  const stageColor = (stage: string) => STAGES.find(s => s.key === stage)?.color || 'var(--accent)'
-
   return (
-    <div className="app-layout">
+    <div className="flex min-h-screen bg-slate-950 text-slate-50">
       <Sidebar />
-      <main className="main-content">
-        <div className="page-header">
+      <main className="flex-1 ml-64 p-8 xl:p-10 flex flex-col h-screen overflow-hidden">
+        
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 shrink-0 gap-4">
           <div>
-            <h1 className="page-title">Pipeline</h1>
-            <p className="page-subtitle">AED {totalPipeline.toLocaleString()} total · AED {wonValue.toLocaleString()} won</p>
+            <h1 className="text-3xl font-bold tracking-tight text-white mb-1">Pipeline</h1>
+            <p className="text-sm text-slate-400">
+              <span className="font-semibold text-[#D4AF37]">AED {totalPipeline.toLocaleString()}</span> total pipeline · <span className="text-emerald-400 font-semibold">AED {wonValue.toLocaleString()}</span> won
+            </p>
           </div>
-          <button className="btn btn-primary" onClick={() => setShowForm(true)}>+ New Deal</button>
+          <Button className="bg-gradient-to-r from-[#D4AF37] to-[#B8963E] text-slate-950 hover:opacity-90 transition-opacity whitespace-nowrap" onClick={() => setShowForm(true)}>
+            <Plus className="mr-2 h-4 w-4" /> New Deal
+          </Button>
         </div>
 
-        {/* Summary bar */}
-        <div className="stats-grid" style={{ gridTemplateColumns: 'repeat(6, 1fr)', marginBottom: 24 }}>
+        {/* Summary Metric Board */}
+        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4 mb-6 shrink-0">
           {STAGES.map(s => {
             const stageDeals = dealsByStage(s.key)
             const val = stageDeals.reduce((sum, d) => sum + (parseFloat(d.amount) || 0), 0)
             return (
-              <div key={s.key} className="card" style={{ padding: '14px 16px', borderTop: `2px solid ${s.color}` }}>
-                <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 6 }}>{s.label}</div>
-                <div style={{ fontSize: 22, fontWeight: 800 }}>{stageDeals.length}</div>
-                <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>AED {val.toLocaleString()}</div>
-              </div>
+              <Card key={s.key} className={`bg-slate-900 border-t-2 border-r-0 border-l-0 border-b-0 border-slate-800 ${s.color}`}>
+                <CardContent className="p-4 flex flex-col justify-between h-full">
+                  <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">{s.label}</div>
+                  <div>
+                    <div className="text-2xl font-black text-white leading-none mb-1">{stageDeals.length}</div>
+                    <div className="text-xs text-slate-400">AED {val.toLocaleString()}</div>
+                  </div>
+                </CardContent>
+              </Card>
             )
           })}
         </div>
 
-        {/* Kanban board */}
-        <div className="pipeline-board">
+        {/* Kanban Board Area */}
+        <div className="flex-1 flex gap-5 overflow-x-auto pb-4">
           {STAGES.map(stage => (
-            <div key={stage.key} className="pipeline-col"
+            <div key={stage.key} className="flex flex-col w-[300px] shrink-0"
               onDragOver={e => { e.preventDefault(); setDragOver(stage.key) }}
-              onDrop={() => handleDrop(stage.key)}
-              style={{ borderTop: `3px solid ${stage.color}`, opacity: dragOver === stage.key ? 0.85 : 1, background: dragOver === stage.key ? 'rgba(99,102,241,0.05)' : undefined }}>
-              <div className="pipeline-col-header">
-                <div className="pipeline-col-title" style={{ color: stage.color }}>{stage.label}</div>
-                <div className="pipeline-col-count">{dealsByStage(stage.key).length}</div>
+              onDrop={() => handleDrop(stage.key)}>
+              
+              {/* Column Header */}
+              <div className={`mb-3 pb-2 flex items-center justify-between border-b-2 ${dragOver === stage.key ? `border-b` : ''} ${stage.color}`}>
+                <div className={`font-semibold text-sm ${stage.text}`}>{stage.label}</div>
+                <Badge variant="outline" className="border-slate-700 bg-slate-800/50 text-slate-400">{dealsByStage(stage.key).length}</Badge>
               </div>
-              {dealsByStage(stage.key).map(deal => (
-                <div key={deal.id} className="deal-card" draggable
-                  onDragStart={() => handleDragStart(deal.id)}
-                  onDragEnd={() => { setDragging(null); setDragOver(null) }}>
-                  <div className="deal-title">{deal.title}</div>
-                  <div className="deal-amount">AED {parseFloat(deal.amount || '0').toLocaleString()}</div>
-                  <div className="deal-meta">
-                    {deal.probability && <span>🎯 {deal.probability}% probability</span>}
+
+              {/* Column Content */}
+              <div className={`flex-1 overflow-y-auto space-y-3 p-1 rounded-xl transition-colors ${dragOver === stage.key ? 'bg-slate-800/80 ring-1 ring-[#D4AF37]/50' : ''}`}>
+                {dealsByStage(stage.key).map(deal => (
+                  <Card key={deal.id} draggable
+                    className="bg-slate-900 border-slate-700 hover:border-[#D4AF37]/50 hover:shadow-[0_4px_12px_rgba(212,175,55,0.05)] transition-all cursor-grab active:cursor-grabbing"
+                    onDragStart={() => handleDragStart(deal.id)}
+                    onDragEnd={() => { setDragging(null); setDragOver(null) }}>
+                    <CardContent className="p-4">
+                      {/* Deal Title */}
+                      <div className="font-semibold text-sm text-slate-100 mb-2 leading-snug">{deal.title}</div>
+                      
+                      {/* Meta Info */}
+                      <div className="flex items-end justify-between mb-3">
+                        <div className="text-lg font-black text-emerald-400 leading-none">
+                          <span className="text-[10px] text-emerald-400/60 font-semibold mr-1">AED</span>
+                          {parseFloat(deal.amount || '0').toLocaleString()}
+                        </div>
+                        {deal.probability && (
+                          <div className="flex items-center text-[10px] text-slate-400 border border-slate-800 px-1.5 py-0.5 rounded bg-slate-950">
+                            <Target className="w-3 h-3 mr-1 text-[#D4AF37]" /> {deal.probability}%
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Notes snippet */}
+                      {deal.notes && (
+                        <div className="text-[11px] text-slate-400 bg-slate-950 p-2 rounded-md border border-slate-800 mb-3 truncate hover:whitespace-normal transition-all">
+                          {deal.notes}
+                        </div>
+                      )}
+
+                      {/* View Stakeholders Action */}
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="w-full h-8 text-[11px] font-bold tracking-wider uppercase text-[#D4AF37] border border-[#D4AF37]/20 hover:bg-[#D4AF37]/10"
+                        onClick={e => { e.stopPropagation(); setSelectedDeal(deal) }}>
+                        <Users className="w-3 h-3 mr-2" /> Stakeholders
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ))}
+                
+                {dealsByStage(stage.key).length === 0 && (
+                  <div className="py-8 px-4 text-center border-2 border-dashed border-slate-800 rounded-xl">
+                    <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Drop deal here</p>
                   </div>
-                  {deal.notes && (
-                    <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 6, padding: '6px 8px', background: 'var(--bg-glass)', borderRadius: 6 }}>
-                      {deal.notes}
-                    </div>
-                  )}
-                  {/* Stakeholder peek */}
-                  <button
-                    onClick={e => { e.stopPropagation(); setSelectedDeal(deal) }}
-                    style={{
-                      marginTop: 10, width: '100%', padding: '5px', borderRadius: 6, fontSize: 11,
-                      background: 'rgba(212,175,55,0.08)', border: '1px solid rgba(212,175,55,0.2)',
-                      color: '#D4AF37', cursor: 'pointer', fontWeight: 600,
-                    }}>
-                    👥 View Stakeholders
-                  </button>
-                </div>
-              ))}
-              {dealsByStage(stage.key).length === 0 && (
-                <div style={{ padding: '24px 12px', textAlign: 'center', color: 'var(--text-muted)', fontSize: 13, border: '1px dashed var(--border)', borderRadius: 'var(--radius-sm)' }}>
-                  Drop deals here
-                </div>
-              )}
+                )}
+              </div>
             </div>
           ))}
         </div>
 
-        {/* Stakeholder Map Panel */}
+        {/* Stakeholder Map Overlay */}
         {selectedDeal && (
-          <div style={{
-            position: 'fixed', inset: 0, zIndex: 1000,
-            background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(4px)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20,
-          }} onClick={() => setSelectedDeal(null)}>
-            <div style={{
-              background: 'var(--bg-secondary)', borderRadius: 16, padding: '28px 32px',
-              maxWidth: 640, width: '100%', maxHeight: '80vh', overflowY: 'auto',
-              border: '1px solid rgba(212,175,55,0.2)',
-              boxShadow: '0 24px 80px rgba(0,0,0,0.5)',
-            }} onClick={e => e.stopPropagation()}>
-              {/* Header */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
+          <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 lg:p-8 overflow-y-auto w-screen" onClick={() => setSelectedDeal(null)}>
+            <div className="bg-slate-950 border border-[#D4AF37]/30 rounded-2xl w-full max-w-4xl shadow-[0_24px_80px_rgba(0,0,0,0.5)] my-auto" onClick={e => e.stopPropagation()}>
+              <div className="p-6 border-b border-slate-800 flex justify-between items-start">
                 <div>
-                  <div style={{ fontSize: 11, color: '#D4AF37', fontWeight: 700, letterSpacing: 1, marginBottom: 4 }}>STAKEHOLDER MAP</div>
-                  <div style={{ fontSize: 17, fontWeight: 800 }}>{selectedDeal.title}</div>
-                  <div style={{ display: 'flex', gap: 8, marginTop: 6, alignItems: 'center' }}>
-                    <span style={{ fontSize: 12, color: stageColor(selectedDeal.stage), fontWeight: 600, padding: '2px 10px', borderRadius: 20, background: `${stageColor(selectedDeal.stage)}18`, border: `1px solid ${stageColor(selectedDeal.stage)}30` }}>
+                  <div className="text-[10px] text-[#D4AF37] font-bold tracking-[0.2em] mb-1">STAKEHOLDER MAP</div>
+                  <h2 className="text-xl md:text-2xl font-bold text-white">{selectedDeal.title}</h2>
+                  <div className="flex items-center gap-3 mt-3">
+                    <Badge variant="outline" className={`${STAGES.find(s => s.key === selectedDeal.stage)?.text} ${STAGES.find(s => s.key === selectedDeal.stage)?.bg} ${STAGES.find(s => s.key === selectedDeal.stage)?.color} uppercase tracking-wider text-[10px]`}>
                       {selectedDeal.stage}
+                    </Badge>
+                    <span className="text-sm font-semibold text-[#D4AF37]">
+                      AED {parseFloat(selectedDeal.amount || '0').toLocaleString()}
                     </span>
-                    <span style={{ fontSize: 12, color: '#D4AF37', fontWeight: 600 }}>AED {parseFloat(selectedDeal.amount || '0').toLocaleString()}</span>
                   </div>
                 </div>
-                <button onClick={() => setSelectedDeal(null)} style={{ background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: 'var(--text-muted)', lineHeight: 1 }}>✕</button>
+                <Button variant="ghost" size="icon" className="hover:bg-slate-800 rounded-full" onClick={() => setSelectedDeal(null)}>
+                  ✕
+                </Button>
               </div>
-
-              <StakeholderMap
-                contacts={DUMMY_CONTACTS[selectedDeal.id] || []}
-                dealStage={selectedDeal.stage}
-                onRoleChange={(contactId, role) => {
-                  console.log(`Contact ${contactId} role updated to ${role}`)
-                  // TODO: persist via API /api/contacts/{id}/role
-                }}
-              />
+              <div className="p-6">
+                <StakeholderMap
+                  contacts={DUMMY_CONTACTS[selectedDeal.id] || []}
+                  dealStage={selectedDeal.stage}
+                  onRoleChange={(contactId, role) => {
+                    console.log(`Contact ${contactId} role updated to ${role}`)
+                    // API request logic goes here
+                  }}
+                />
+              </div>
             </div>
           </div>
         )}
 
-        {/* Add Deal Modal */}
+        {/* Add Deal Modal Overlay */}
         {showForm && (
-          <div className="modal-overlay" onClick={e => { if (e.target === e.currentTarget) setShowForm(false) }}>
-            <div className="modal">
-              <div className="modal-title">Create New Deal</div>
-              <div className="form-group"><label className="form-label">Deal Title *</label><input className="form-input" placeholder="e.g. Al Habtoor Group — Enterprise" value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} /></div>
-              <div className="two-col">
-                <div className="form-group"><label className="form-label">Amount (AED)</label><input className="form-input" type="number" placeholder="50000" value={form.amount} onChange={e => setForm(f => ({ ...f, amount: e.target.value }))} /></div>
-                <div className="form-group"><label className="form-label">Probability %</label><input className="form-input" type="number" placeholder="70" value={form.probability} onChange={e => setForm(f => ({ ...f, probability: e.target.value }))} /></div>
-              </div>
-              <div className="form-group">
-                <label className="form-label">Stage</label>
-                <select className="form-input form-select" value={form.stage} onChange={e => setForm(f => ({ ...f, stage: e.target.value }))}>
-                  {STAGES.map(s => <option key={s.key} value={s.key}>{s.label}</option>)}
-                </select>
-              </div>
-              <div className="form-group"><label className="form-label">Notes</label><textarea className="form-textarea" placeholder="Any notes about this deal…" value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} /></div>
-              <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
-                <button className="btn btn-ghost" onClick={() => setShowForm(false)}>Cancel</button>
-                <button className="btn btn-primary" onClick={handleCreate} disabled={!form.title}>Create Deal</button>
-              </div>
-            </div>
+          <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4" onClick={e => { if (e.target === e.currentTarget) setShowForm(false) }}>
+            <Card className="w-full max-w-lg bg-slate-900 border-slate-700 shadow-xl">
+              <CardHeader className="border-b border-slate-800 mb-4 pb-4">
+                <CardTitle>Create New Deal</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1.5">Deal Title</label>
+                  <input className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#D4AF37]/50" 
+                         placeholder="e.g. Al Habtoor Group — Enterprise" value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1.5">Amount (AED)</label>
+                    <input className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#D4AF37]/50" 
+                           type="number" placeholder="50000" value={form.amount} onChange={e => setForm(f => ({ ...f, amount: e.target.value }))} />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1.5">Probability %</label>
+                    <input className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#D4AF37]/50" 
+                           type="number" placeholder="70" value={form.probability} onChange={e => setForm(f => ({ ...f, probability: e.target.value }))} />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1.5">Stage</label>
+                  <select className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#D4AF37]/50" 
+                          value={form.stage} onChange={e => setForm(f => ({ ...f, stage: e.target.value }))}>
+                    {STAGES.map(s => <option key={s.key} value={s.key}>{s.label}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1.5">Notes</label>
+                  <textarea className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#D4AF37]/50 min-h-[80px]" 
+                            placeholder="Any notes about this deal…" value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} />
+                </div>
+                <div className="flex justify-end gap-3 pt-4">
+                  <Button variant="ghost" onClick={() => setShowForm(false)}>Cancel</Button>
+                  <Button className="bg-[#D4AF37] text-slate-950 hover:bg-[#D4AF37]/90" onClick={handleCreate} disabled={!form.title}>Create Deal</Button>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         )}
       </main>

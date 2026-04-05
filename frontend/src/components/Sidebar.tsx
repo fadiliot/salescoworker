@@ -2,18 +2,24 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
+import { 
+  Diamond, LayoutDashboard, Target, KanbanSquare, Mail, 
+  Activity, Bell, Settings, PhoneCall, CheckCircle2 
+} from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { Badge } from '@/components/ui/badge'
 
 const NAV_ITEMS = [
-  { href: '/', icon: '◆', label: 'Dashboard' },
-  { href: '/leads', icon: '◈', label: 'Leads', badge: null },
-  { href: '/pipeline', icon: '⬡', label: 'Pipeline' },
-  { href: '/inbox', icon: '✉', label: 'Inbox', badge: '5', badgeType: '' },
-  { href: '/activities', icon: '◷', label: 'Activities' },
-  { href: '/reminders', icon: '◉', label: 'Reminders', badge: '2', badgeType: 'hot' },
+  { href: '/', icon: LayoutDashboard, label: 'Dashboard' },
+  { href: '/leads', icon: Target, label: 'Leads', badge: null },
+  { href: '/pipeline', icon: KanbanSquare, label: 'Pipeline' },
+  { href: '/inbox', icon: Mail, label: 'Inbox', badge: '5', badgeType: '' },
+  { href: '/activities', icon: Activity, label: 'Activities' },
+  { href: '/reminders', icon: Bell, label: 'Reminders', badge: '2', badgeType: 'hot' },
 ]
 
 const BOTTOM_ITEMS = [
-  { href: '/settings', icon: '◎', label: 'Settings' },
+  { href: '/settings', icon: Settings, label: 'Settings' },
 ]
 
 export default function Sidebar() {
@@ -30,105 +36,128 @@ export default function Sidebar() {
   }, [])
 
   return (
-    <div className="sidebar" style={{ display: 'flex', flexDirection: 'column', background: 'linear-gradient(180deg, #0F172A 0%, #1E293B 100%)' }}>
-      {/* Logo */}
-      <div style={{ padding: '22px 20px 14px', borderBottom: '1px solid rgba(212,175,55,0.12)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{
-            width: 36, height: 36, borderRadius: 10,
-            background: 'linear-gradient(135deg, #D4AF37, #B8963E)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 18, boxShadow: '0 0 18px rgba(212,175,55,0.35)',
-          }}>🦅</div>
-          <div>
-            <div style={{ fontSize: 17, fontWeight: 900, letterSpacing: 1, color: '#D4AF37', lineHeight: 1 }}>SalesAI</div>
-            <div style={{ fontSize: 10, color: 'rgba(212,175,55,0.5)', letterSpacing: 0.8 }}>UAE EDITION</div>
+    <aside className="w-64 border-r border-[#D4AF37]/10 flex flex-col fixed inset-y-0 left-0 overflow-y-auto" style={{ background: 'linear-gradient(180deg, #0F172A 0%, #1E293B 100%)' }}>
+      {/* Header & Logo */}
+      <div className="px-5 pt-6 pb-4 border-b border-[#D4AF37]/10 shrink-0">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center text-black font-bold shadow-[0_0_20px_rgba(212,175,55,0.3)] bg-gradient-to-br from-[#D4AF37] to-[#B8963E]">
+            <Diamond className="w-5 h-5" fill="currentColor" />
+          </div>
+          <div className="flex flex-col">
+            <span className="text-lg font-black tracking-widest text-[#D4AF37] leading-none uppercase">SalesAI</span>
+            <span className="text-[10px] text-[#D4AF37]/50 tracking-[0.1em] mt-1 font-semibold">DUBAI GOLD</span>
           </div>
         </div>
-        {/* Time widget */}
-        <div style={{ marginTop: 12, padding: '8px 10px', borderRadius: 8, background: 'rgba(212,175,55,0.06)', border: '1px solid rgba(212,175,55,0.1)', fontSize: 11 }}>
-          <div style={{ color: 'rgba(212,175,55,0.8)', fontWeight: 600 }}>🕐 Dubai, UAE — {timeStr}</div>
-          <div style={{ color: 'rgba(100,116,139,0.8)', marginTop: 2 }}>Next: Maghrib ~18:43</div>
+
+        {/* Dubai Live Context */}
+        <div className="mt-5 p-3 rounded-xl bg-[#D4AF37]/5 border border-[#D4AF37]/10 flex flex-col gap-1">
+          <div className="text-xs font-semibold text-[#D4AF37]/80 flex items-center gap-2">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#D4AF37] opacity-40"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#D4AF37]"></span>
+            </span>
+            Dubai — {timeStr}
+          </div>
+          <div className="text-[10px] text-slate-500 font-medium">Next: Maghrib ~18:43</div>
         </div>
       </div>
 
-      {/* EN/AR toggle */}
-      <div style={{ padding: '10px 20px' }}>
-        <div style={{ display: 'inline-flex', borderRadius: 8, overflow: 'hidden', border: '1px solid rgba(212,175,55,0.2)' }}>
+      {/* Language Toggle */}
+      <div className="px-5 py-3 shrink-0">
+        <div className="inline-flex rounded-lg overflow-hidden border border-[#D4AF37]/20 p-0.5 bg-slate-900/50">
           {(['EN', 'AR'] as const).map(l => (
-            <button key={l} onClick={() => setLang(l)} style={{
-              padding: '4px 14px', fontSize: 11, fontWeight: 700,
-              background: lang === l ? 'rgba(212,175,55,0.15)' : 'transparent',
-              color: lang === l ? '#D4AF37' : 'var(--text-muted)',
-              border: 'none', cursor: 'pointer', letterSpacing: 0.8,
-            }}>{l}</button>
+            <button key={l} onClick={() => setLang(l)} className={cn(
+              "px-4 py-1 text-[11px] font-bold tracking-wider rounded-md transition-all",
+              lang === l ? "bg-[#D4AF37]/20 text-[#D4AF37] shadow-sm" : "hover:bg-white/5 text-slate-500"
+            )}>
+              {l}
+            </button>
           ))}
         </div>
       </div>
 
-      {/* Nav */}
-      <nav className="sidebar-nav" style={{ flex: 1 }}>
-        <div className="nav-section">
-          <div className="nav-label" style={{ color: 'rgba(212,175,55,0.4)', letterSpacing: 1 }}>WORKSPACE</div>
-          {NAV_ITEMS.map(item => (
-            <Link key={item.href} href={item.href}
-              className={`nav-item${pathname === item.href ? ' active' : ''}`}
-              style={pathname === item.href ? { background: 'rgba(212,175,55,0.1)', color: '#D4AF37', borderLeft: '3px solid #D4AF37' } : {}}>
-              <span style={{ fontSize: 13, opacity: 0.8 }}>{item.icon}</span>
-              {item.label}
-              {item.badge && (
-                <span className={`nav-badge${item.badgeType === 'hot' ? ' hot' : ''}`}>{item.badge}</span>
-              )}
-            </Link>
-          ))}
+      {/* Navigation */}
+      <nav className="flex-1 px-3 py-4 space-y-8 overflow-y-auto">
+        <div className="space-y-1">
+          <p className="px-3 text-[10px] font-bold tracking-widest text-slate-500 mb-3">WORKSPACE</p>
+          {NAV_ITEMS.map((item) => {
+            const Icon = item.icon
+            const isActive = pathname === item.href
+            return (
+              <Link key={item.href} href={item.href} className={cn(
+                "group flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200",
+                isActive 
+                  ? "bg-[#D4AF37]/10 text-[#D4AF37] shadow-[inset_2px_0_0_#D4AF37]" 
+                  : "text-slate-400 hover:text-white hover:bg-slate-800/50"
+              )}>
+                <Icon className={cn("w-4 h-4 transition-colors", isActive ? "text-[#D4AF37]" : "text-slate-500 group-hover:text-slate-300")} />
+                {item.label}
+                {item.badge && (
+                  <Badge variant={item.badgeType === 'hot' ? 'destructive' : 'default'} className={cn("ml-auto h-5 px-1.5 text-[10px] font-bold shadow-none", item.badgeType === 'hot' ? 'bg-orange-500 hover:bg-orange-600' : 'bg-[#D4AF37] text-slate-900 hover:bg-[#D4AF37]/90')}>
+                    {item.badge}
+                  </Badge>
+                )}
+              </Link>
+            )
+          })}
         </div>
-        <div className="nav-section">
-          <div className="nav-label" style={{ color: 'rgba(212,175,55,0.4)', letterSpacing: 1 }}>SYSTEM</div>
-          {BOTTOM_ITEMS.map(item => (
-            <Link key={item.href} href={item.href} className={`nav-item${pathname === item.href ? ' active' : ''}`}>
-              <span style={{ fontSize: 13, opacity: 0.8 }}>{item.icon}</span>
-              {item.label}
-            </Link>
-          ))}
+
+        <div className="space-y-1">
+          <p className="px-3 text-[10px] font-bold tracking-widest text-slate-500 mb-3">SYSTEM</p>
+          {BOTTOM_ITEMS.map((item) => {
+            const Icon = item.icon
+            const isActive = pathname === item.href
+            return (
+              <Link key={item.href} href={item.href} className={cn(
+                "group flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200",
+                isActive ? "bg-[#D4AF37]/10 text-[#D4AF37] shadow-[inset_2px_0_0_#D4AF37]" : "text-slate-400 hover:text-white hover:bg-slate-800/50"
+              )}>
+                <Icon className={cn("w-4 h-4", isActive ? "text-[#D4AF37]" : "text-slate-500 group-hover:text-slate-300")} />
+                {item.label}
+              </Link>
+            )
+          })}
         </div>
       </nav>
 
-      {/* PBX status pill */}
-      <div style={{ padding: '12px 16px', borderTop: '1px solid rgba(212,175,55,0.1)', margin: '0 4px' }}>
-        <div onClick={() => setPbxOnline(p => !p)} style={{
-          display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px',
-          borderRadius: 10,
-          background: pbxOnline ? 'rgba(16,185,129,0.07)' : 'rgba(239,68,68,0.07)',
-          border: `1px solid ${pbxOnline ? 'rgba(16,185,129,0.2)' : 'rgba(239,68,68,0.2)'}`,
-          cursor: 'pointer', transition: 'all 0.2s',
-        }}>
-          <div style={{
-            width: 8, height: 8, borderRadius: '50%',
-            background: pbxOnline ? '#10B981' : '#EF4444',
-            boxShadow: `0 0 8px ${pbxOnline ? '#10B981' : '#EF4444'}`,
-          }} />
-          <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: pbxOnline ? '#10B981' : '#EF4444' }}>
-              {pbxOnline ? 'PBX Online' : 'PBX Offline'}
+      {/* PBX & User Profile */}
+      <div className="shrink-0 p-4 border-t border-[#D4AF37]/10 space-y-4">
+        {/* PBX Pill */}
+        <button 
+          onClick={() => setPbxOnline(p => !p)} 
+          className={cn(
+            "w-full flex items-center justify-between p-3 rounded-xl border transition-all duration-300",
+            pbxOnline ? "bg-emerald-500/10 border-emerald-500/20" : "bg-red-500/10 border-red-500/20"
+          )}
+        >
+          <div className="flex items-center gap-3">
+            <span className="relative flex h-2.5 w-2.5">
+              {pbxOnline && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>}
+              <span className={cn("relative inline-flex rounded-full h-2.5 w-2.5", pbxOnline ? "bg-emerald-500" : "bg-red-500")}></span>
+            </span>
+            <div className="text-left">
+              <p className={cn("text-xs font-bold", pbxOnline ? "text-emerald-500" : "text-red-500")}>
+                {pbxOnline ? 'PBX Online' : 'PBX Offline'}
+              </p>
+              <p className="text-[10px] text-slate-500 mt-0.5">Yeastar Integration</p>
             </div>
-            <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>Yeastar PBX</div>
           </div>
-          <span style={{ fontSize: 14 }}>📞</span>
-        </div>
+          <PhoneCall className={cn("w-4 h-4", pbxOnline ? "text-emerald-500/50" : "text-red-500/50")} />
+        </button>
 
-        {/* Agent card */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 4px', marginTop: 8 }}>
-          <div style={{
-            width: 32, height: 32, borderRadius: '50%',
-            background: 'linear-gradient(135deg, #D4AF37, #B8963E)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 700, color: '#000',
-          }}>F</div>
-          <div>
-            <div style={{ fontSize: 13, fontWeight: 600 }}>Sales Agent</div>
-            <div style={{ fontSize: 10, color: '#D4AF37' }}>✓ Verified</div>
+        {/* User Badge */}
+        <div className="flex items-center gap-3 px-1">
+          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#D4AF37] to-[#B8963E] flex items-center justify-center text-slate-900 font-bold text-sm shadow-lg">
+            F
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-bold text-slate-200 truncate">Fadil Anwar</p>
+            <p className="text-xs text-[#D4AF37] flex items-center gap-1">
+              <CheckCircle2 className="w-3 h-3" /> Gold Tier
+            </p>
           </div>
         </div>
       </div>
-    </div>
+    </aside>
   )
 }

@@ -1,6 +1,8 @@
 'use client'
 import { useState } from 'react'
 import { updateContactRole } from '@/lib/api'
+import { User, Shield, Briefcase, Glasses, Scale, Crown, AlertTriangle } from 'lucide-react'
+import { Card, CardContent } from '@/components/ui/card'
 
 type StakeholderRole = 'Economic Buyer' | 'Champion' | 'Gatekeeper' | 'Evaluator' | 'Legal' | 'Unknown'
 
@@ -19,13 +21,13 @@ interface StakeholderMapProps {
   onRoleChange?: (contactId: string, role: StakeholderRole) => void
 }
 
-const ROLE_CONFIG: Record<StakeholderRole, { color: string; icon: string; bg: string }> = {
-  'Economic Buyer': { color: '#D4AF37', icon: '👑', bg: 'rgba(212,175,55,0.12)' },
-  'Champion':       { color: '#3B82F6', icon: '⚡', bg: 'rgba(59,130,246,0.1)' },
-  'Gatekeeper':     { color: '#F97316', icon: '🔒', bg: 'rgba(249,115,22,0.1)' },
-  'Evaluator':      { color: '#8B5CF6', icon: '🔍', bg: 'rgba(139,92,246,0.1)' },
-  'Legal':          { color: '#10B981', icon: '⚖️', bg: 'rgba(16,185,129,0.1)' },
-  'Unknown':        { color: '#64748B', icon: '👤', bg: 'rgba(100,116,139,0.08)' },
+const ROLE_CONFIG: Record<StakeholderRole, { color: string; bg: string; iconBase: any }> = {
+  'Economic Buyer': { color: '#D4AF37', bg: 'bg-[#D4AF37]/10', iconBase: Crown },
+  'Champion':       { color: '#3B82F6', bg: 'bg-blue-500/10', iconBase: Shield },
+  'Gatekeeper':     { color: '#F97316', bg: 'bg-orange-500/10', iconBase: Briefcase },
+  'Evaluator':      { color: '#8B5CF6', bg: 'bg-purple-500/10', iconBase: Glasses },
+  'Legal':          { color: '#10B981', bg: 'bg-emerald-500/10', iconBase: Scale },
+  'Unknown':        { color: '#64748B', bg: 'bg-slate-500/10', iconBase: User },
 }
 
 const ROLES: StakeholderRole[] = ['Economic Buyer', 'Champion', 'Gatekeeper', 'Evaluator', 'Legal', 'Unknown']
@@ -42,77 +44,78 @@ export default function StakeholderMap({ contacts, dealStage, onRoleChange }: St
     try {
       await updateContactRole(id, role)
     } catch {
-      // silent — optimistic update already applied
+      // silent optimistic update
     }
   }
 
   if (!localContacts.length) {
     return (
-      <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted)', fontSize: 14 }}>
-        👥 No contacts linked to this deal yet.
+      <div className="py-8 text-center text-slate-500 text-sm border-2 border-dashed border-slate-800 rounded-xl bg-slate-900/50">
+        <Users className="w-8 h-8 opacity-20 mx-auto mb-2" />
+        No contacts linked to this deal yet.
       </div>
     )
   }
 
   return (
-    <div>
+    <div className="space-y-4 text-left">
       {showWarning && (
-        <div style={{
-          background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)',
-          borderRadius: 10, padding: '10px 16px', marginBottom: 16,
-          fontSize: 13, color: '#F87171', display: 'flex', alignItems: 'center', gap: 8
-        }}>
-          ⚠️ <strong>Risk Alert:</strong> Deal is in Negotiation but no Economic Buyer has been tagged. Close rate drops significantly without buyer engagement.
+        <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4 text-sm text-red-400 flex items-start gap-3">
+          <AlertTriangle className="w-5 h-5 shrink-0 mt-0.5" />
+          <p>
+            <strong className="text-red-500">Risk Alert:</strong> Deal is in Negotiation but no Economic Buyer has been tagged. Close rate drops significantly without buyer engagement.
+          </p>
         </div>
       )}
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 12 }}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {localContacts.map(contact => {
           const role = (contact.role_type || 'Unknown') as StakeholderRole
           const cfg = ROLE_CONFIG[role]
+          const Icon = cfg.iconBase
           const isEB = role === 'Economic Buyer'
+
           return (
-            <div key={contact.id} style={{
-              background: cfg.bg,
-              border: `1px solid ${isEB ? cfg.color : 'rgba(255,255,255,0.07)'}`,
-              borderRadius: 12, padding: '14px 16px',
-              boxShadow: isEB ? `0 0 16px ${cfg.color}30` : 'none',
-              transition: 'all 0.2s',
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
-                <div style={{
-                  width: 38, height: 38, borderRadius: '50%',
-                  background: `linear-gradient(135deg, ${cfg.color}80, ${cfg.color}30)`,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 16, flexShrink: 0,
-                  border: isEB ? `2px solid ${cfg.color}` : 'none',
-                }}>
-                  {cfg.icon}
-                </div>
-                <div style={{ minWidth: 0 }}>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: isEB ? cfg.color : 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    {contact.first_name} {contact.last_name}
+            <Card key={contact.id} className={`border ${isEB ? 'border-[#D4AF37] shadow-[0_0_16px_rgba(212,175,55,0.15)] bg-[#D4AF37]/5' : 'border-slate-800 bg-slate-900'} transition-all`}>
+              <CardContent className="p-4 flex flex-col h-full justify-between">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className={`w-10 h-10 rounded-full flex flex-col items-center justify-center shrink-0 border-2 ${isEB ? 'border-[#D4AF37]' : 'border-transparent'} ${cfg.bg}`}>
+                    <Icon className="w-5 h-5" style={{ color: cfg.color }} />
                   </div>
-                  <div style={{ fontSize: 11, color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    {contact.title || contact.email}
+                  <div className="min-w-0 flex-1">
+                    <div className="text-sm font-bold truncate text-slate-100 group-hover:text-white transition-colors" style={{ color: isEB ? cfg.color : '' }}>
+                      {contact.first_name} {contact.last_name}
+                    </div>
+                    <div className="text-[11px] text-slate-500 truncate">
+                      {contact.title || contact.email}
+                    </div>
                   </div>
                 </div>
-              </div>
-              <select
-                value={role}
-                onChange={e => handleRoleChange(contact.id, e.target.value as StakeholderRole)}
-                style={{
-                  width: '100%', background: 'var(--bg-secondary)', border: `1px solid ${cfg.color}50`,
-                  borderRadius: 6, padding: '5px 8px', fontSize: 12, color: cfg.color,
-                  cursor: 'pointer', fontWeight: 600,
-                }}
-              >
-                {ROLES.map(r => <option key={r} value={r}>{ROLE_CONFIG[r].icon} {r}</option>)}
-              </select>
-            </div>
+
+                <div className="relative">
+                  <select
+                    value={role}
+                    onChange={e => handleRoleChange(contact.id, e.target.value as StakeholderRole)}
+                    className={`w-full appearance-none bg-slate-950 border border-slate-800 rounded-lg py-2 pl-3 pr-8 text-xs font-semibold cursor-pointer outline-none focus:ring-1`}
+                    style={{ color: cfg.color, borderColor: isEB ? `${cfg.color}50` : 'true' }}
+                  >
+                    {ROLES.map(r => <option key={r} value={r}>{r}</option>)}
+                  </select>
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-600">
+                    <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           )
         })}
       </div>
     </div>
+  )
+}
+
+function Users(props: any) {
+  return (
+    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
   )
 }
