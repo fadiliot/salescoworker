@@ -62,4 +62,10 @@ export const getTearSheet = (eventId: string, attendeeEmails: string) =>
 export const analyzeRecentCalls = (leadId?: string) =>
   API.post('/api/activities/calls/analyze', null, { params: { lead_id: leadId } }).then(r => r.data)
 
+// ─── Contacts ────────────────────────────────────────────────────
+export const getContactsByLead = (leadId: string) => API.get('/api/contacts', { params: { lead_id: leadId } }).then(r => r.data)
+export const updateContactRole = (contactId: string, role: string) =>
+  API.patch(`/api/contacts/${contactId}/role`, null, { params: { role } }).then(r => r.data)
+
 export default API
+

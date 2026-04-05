@@ -32,6 +32,7 @@ class ContactUpdate(BaseModel):
 class ContactResponse(ContactBase):
     id: UUID
     zoho_contact_id: Optional[str] = None
+    role_type: Optional[str] = None
     created_at: datetime
     updated_at: datetime
 

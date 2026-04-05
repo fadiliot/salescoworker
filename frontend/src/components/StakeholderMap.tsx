@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import { updateContactRole } from '@/lib/api'
 
 type StakeholderRole = 'Economic Buyer' | 'Champion' | 'Gatekeeper' | 'Evaluator' | 'Legal' | 'Unknown'
 
@@ -35,9 +36,14 @@ export default function StakeholderMap({ contacts, dealStage, onRoleChange }: St
   const hasEconomicBuyer = localContacts.some(c => c.role_type === 'Economic Buyer')
   const showWarning = !hasEconomicBuyer && dealStage === 'negotiation'
 
-  const handleRoleChange = (id: string, role: StakeholderRole) => {
+  const handleRoleChange = async (id: string, role: StakeholderRole) => {
     setLocalContacts(prev => prev.map(c => c.id === id ? { ...c, role_type: role } : c))
     onRoleChange?.(id, role)
+    try {
+      await updateContactRole(id, role)
+    } catch {
+      // silent — optimistic update already applied
+    }
   }
 
   if (!localContacts.length) {
