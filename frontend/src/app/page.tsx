@@ -161,7 +161,7 @@ export default function Dashboard() {
                 {stats.recent_leads.map(lead => (
                   <div key={lead.id} className="flex items-center group cursor-pointer" onClick={() => window.location.href = `/leads/${lead.id}`}>
                     <div className="w-10 h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center font-bold text-sm text-[#D4AF37]">
-                      {lead.name.charAt(0)}
+                      {lead.name?.charAt(0) || '?'}
                     </div>
                     <div className="ml-4 space-y-1">
                       <p className="text-sm font-medium leading-none text-slate-200 group-hover:text-[#D4AF37] transition-colors">
@@ -270,7 +270,7 @@ export default function Dashboard() {
                 {stats.recent_emails.map(email => (
                   <div key={email.id} className="flex items-start gap-3 p-3 -mx-3 rounded-lg hover:bg-slate-800/50 cursor-pointer transition-colors" onClick={() => window.location.href = '/inbox'}>
                     <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center font-bold text-xs text-blue-400 shrink-0">
-                      {email.from.charAt(0).toUpperCase()}
+                      {email.from?.charAt(0)?.toUpperCase() || '?'}
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className={`text-sm truncate ${email.is_read ? 'text-slate-300' : 'text-white font-semibold'}`}>
