@@ -8,14 +8,9 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 
-const STAGES = [
-  { key: 'new', label: 'New', color: 'border-blue-500', bg: 'bg-blue-500/10', text: 'text-blue-500' },
-  { key: 'contacted', label: 'Contacted', color: 'border-cyan-500', bg: 'bg-cyan-500/10', text: 'text-cyan-500' },
-  { key: 'proposal', label: 'Proposal', color: 'border-purple-500', bg: 'bg-purple-500/10', text: 'text-purple-500' },
-  { key: 'negotiation', label: 'Negotiation', color: 'border-orange-500', bg: 'bg-orange-500/10', text: 'text-orange-500' },
-  { key: 'won', label: 'Won 🎉', color: 'border-emerald-500', bg: 'bg-emerald-500/10', text: 'text-emerald-500' },
-  { key: 'lost', label: 'Lost', color: 'border-red-500', bg: 'bg-red-500/10', text: 'text-red-500' },
-]
+import { useLanguage } from '@/context/LanguageContext'
+
+// STAGES moved inside component to use translations
 
 const DUMMY_DEALS = [
   { id: '8c2a9d8f-4e1b-4f7c-9b1d-2a8b3c4d5e61', title: 'Al Habtoor Group — CRM Suite', stage: 'proposal', amount: '165000', currency: 'AED', probability: '70', notes: 'Discussing implementation timeline', lead_id: '550e8400-e29b-41d4-a716-446655440001' },
@@ -43,7 +38,17 @@ const DUMMY_CONTACTS: Record<string, any[]> = {
 }
 
 export default function PipelinePage() {
+  const { t } = useLanguage()
   const [deals, setDeals] = useState(DUMMY_DEALS)
+
+  const STAGES = [
+    { key: 'new', label: t('new'), color: 'border-blue-500', bg: 'bg-blue-500/10', text: 'text-blue-500' },
+    { key: 'contacted', label: t('contacted'), color: 'border-cyan-500', bg: 'bg-cyan-500/10', text: 'text-cyan-500' },
+    { key: 'proposal', label: t('proposal'), color: 'border-purple-500', bg: 'bg-purple-500/10', text: 'text-purple-500' },
+    { key: 'negotiation', label: t('negotiation'), color: 'border-orange-500', bg: 'bg-orange-500/10', text: 'text-orange-500' },
+    { key: 'won', label: t('won'), color: 'border-emerald-500', bg: 'bg-emerald-500/10', text: 'text-emerald-500' },
+    { key: 'lost', label: t('lost'), color: 'border-red-500', bg: 'bg-red-500/10', text: 'text-red-500' },
+  ]
   const [dragging, setDragging] = useState<string | null>(null)
   const [dragOver, setDragOver] = useState<string | null>(null)
   const [showForm, setShowForm] = useState(false)
@@ -90,13 +95,13 @@ export default function PipelinePage() {
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 shrink-0 gap-4">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-white mb-1">Pipeline</h1>
+            <h1 className="text-3xl font-bold tracking-tight text-white mb-1">{t('pipeline')}</h1>
             <p className="text-sm text-slate-400">
-              <span className="font-semibold text-[#D4AF37]">AED {totalPipeline.toLocaleString()}</span> total pipeline · <span className="text-emerald-400 font-semibold">AED {wonValue.toLocaleString()}</span> won
+              <span className="font-semibold text-[#D4AF37]">AED {totalPipeline.toLocaleString()}</span> {t('total_pipeline').toLowerCase()} · <span className="text-emerald-400 font-semibold">AED {wonValue.toLocaleString()}</span> {t('won').toLowerCase()}
             </p>
           </div>
           <Button className="bg-gradient-to-r from-[#D4AF37] to-[#B8963E] text-slate-950 hover:opacity-90 transition-opacity whitespace-nowrap" onClick={() => setShowForm(true)}>
-            <Plus className="mr-2 h-4 w-4" /> New Deal
+            <Plus className="mr-2 h-4 w-4" /> {t('new_lead')}
           </Button>
         </div>
 
@@ -169,7 +174,7 @@ export default function PipelinePage() {
                         size="sm" 
                         className="w-full h-8 text-[11px] font-bold tracking-wider uppercase text-[#D4AF37] border border-[#D4AF37]/20 hover:bg-[#D4AF37]/10"
                         onClick={e => { e.stopPropagation(); setSelectedDeal(deal) }}>
-                        <Users className="w-3 h-3 mr-2" /> Stakeholders
+                        <Users className="w-3 h-3 mr-2" /> {t('stakeholders')}
                       </Button>
                     </CardContent>
                   </Card>
@@ -177,7 +182,7 @@ export default function PipelinePage() {
                 
                 {dealsByStage(stage.key).length === 0 && (
                   <div className="py-8 px-4 text-center border-2 border-dashed border-slate-800 rounded-xl">
-                    <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Drop deal here</p>
+                    <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{t('drop_here')}</p>
                   </div>
                 )}
               </div>
@@ -229,37 +234,37 @@ export default function PipelinePage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1.5">Deal Title</label>
+                  <label className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1.5">{t('deal_title')}</label>
                   <input className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#D4AF37]/50" 
                          placeholder="e.g. Al Habtoor Group — Enterprise" value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1.5">Amount (AED)</label>
+                    <label className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1.5">{t('amount')} (AED)</label>
                     <input className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#D4AF37]/50" 
                            type="number" placeholder="50000" value={form.amount} onChange={e => setForm(f => ({ ...f, amount: e.target.value }))} />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1.5">Probability %</label>
+                    <label className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1.5">{t('probability')} %</label>
                     <input className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#D4AF37]/50" 
                            type="number" placeholder="70" value={form.probability} onChange={e => setForm(f => ({ ...f, probability: e.target.value }))} />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1.5">Stage</label>
+                  <label className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1.5">{t('status')}</label>
                   <select className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#D4AF37]/50" 
                           value={form.stage} onChange={e => setForm(f => ({ ...f, stage: e.target.value }))}>
                     {STAGES.map(s => <option key={s.key} value={s.key}>{s.label}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1.5">Notes</label>
+                  <label className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1.5">{t('notes')}</label>
                   <textarea className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#D4AF37]/50 min-h-[80px]" 
-                            placeholder="Any notes about this deal…" value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} />
+                            placeholder="..." value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} />
                 </div>
                 <div className="flex justify-end gap-3 pt-4">
                   <Button variant="ghost" onClick={() => setShowForm(false)}>Cancel</Button>
-                  <Button className="bg-[#D4AF37] text-slate-950 hover:bg-[#D4AF37]/90" onClick={handleCreate} disabled={!form.title}>Create Deal</Button>
+                  <Button className="bg-[#D4AF37] text-slate-950 hover:bg-[#D4AF37]/90" onClick={handleCreate} disabled={!form.title}>{t('new_lead')}</Button>
                 </div>
               </CardContent>
             </Card>

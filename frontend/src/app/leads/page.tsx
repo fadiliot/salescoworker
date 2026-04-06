@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Search, Plus, Filter, Bot, Mail, Trash2, Zap } from 'lucide-react'
 
+import { useLanguage } from '@/context/LanguageContext'
+
 const DUMMY_LEADS = [
   { id: '550e8400-e29b-41d4-a716-446655440001', first_name: 'Sarah', last_name: 'Chen', email: 'sarah.chen@techcorp.io', company: 'TechCorp Inc', title: 'VP of Operations', status: 'qualified', source: 'email', score: 85, is_hot: 'true', phone: '+1-555-0101', created_at: "2026-04-05T10:00:00Z" },
   { id: '550e8400-e29b-41d4-a716-446655440002', first_name: 'Marcus', last_name: 'Williams', email: 'm.williams@finova.com', company: 'Finova Capital', title: 'CFO', status: 'proposal', source: 'referral', score: 72, is_hot: 'true', phone: '+1-555-0102', created_at: "2026-04-05T09:00:00Z" },
@@ -38,6 +40,7 @@ function StatusBadge({ status }: { status: string }) {
 }
 
 export default function LeadsPage() {
+  const { t } = useLanguage()
   const [leads, setLeads] = useState(DUMMY_LEADS)
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
@@ -83,15 +86,15 @@ export default function LeadsPage() {
       <main className="flex-1 ms-64 p-8 xl:p-10 flex flex-col h-screen overflow-hidden">
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 shrink-0 gap-4">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-white mb-1">Leads</h1>
-            <p className="text-sm text-slate-400">{filtered.length} leads matching criteria</p>
+            <h1 className="text-3xl font-bold tracking-tight text-white mb-1">{t('leads')}</h1>
+            <p className="text-sm text-slate-400">{filtered.length} {t('leads').toLowerCase()}</p>
           </div>
           <div className="flex gap-3">
             <Button variant="outline" className="border-slate-800 bg-slate-900 text-slate-300 hover:text-white hover:bg-slate-800" onClick={handleScoreAll} disabled={scoring}>
-              <Bot className="w-4 h-4 mr-2 text-indigo-400" /> {scoring ? 'Scoring...' : 'AI Score All'}
+              <Bot className="w-4 h-4 mr-2 text-indigo-400" /> {scoring ? '...' : t('ai_score_all')}
             </Button>
             <Button className="bg-gradient-to-r from-[#D4AF37] to-[#B8963E] text-slate-950 hover:opacity-90 transition-opacity" onClick={() => setShowForm(true)}>
-              <Plus className="mr-2 h-4 w-4" /> New Lead
+              <Plus className="mr-2 h-4 w-4" /> {t('new_lead')}
             </Button>
           </div>
         </div>
@@ -123,13 +126,13 @@ export default function LeadsPage() {
             <table className="w-full text-left border-collapse">
               <thead className="sticky top-0 bg-slate-900/95 backdrop-blur-sm z-10">
                 <tr>
-                  <th className="py-3 px-4 text-xs font-semibold text-slate-500 uppercase tracking-widest border-b border-slate-800">Lead</th>
-                  <th className="py-3 px-4 text-xs font-semibold text-slate-500 uppercase tracking-widest border-b border-slate-800">Company</th>
-                  <th className="py-3 px-4 text-xs font-semibold text-slate-500 uppercase tracking-widest border-b border-slate-800">Phone</th>
-                  <th className="py-3 px-4 text-xs font-semibold text-slate-500 uppercase tracking-widest border-b border-slate-800">Source</th>
-                  <th className="py-3 px-4 text-xs font-semibold text-slate-500 uppercase tracking-widest border-b border-slate-800">Status</th>
-                  <th className="py-3 px-4 text-xs font-semibold text-slate-500 uppercase tracking-widest border-b border-slate-800">Score</th>
-                  <th className="py-3 px-4 text-xs font-semibold text-slate-500 uppercase tracking-widest border-b border-slate-800 text-right">Actions</th>
+                  <th className="py-3 px-4 text-xs font-semibold text-slate-500 uppercase tracking-widest border-b border-slate-800">{t('leads')}</th>
+                  <th className="py-3 px-4 text-xs font-semibold text-slate-500 uppercase tracking-widest border-b border-slate-800">{t('company')}</th>
+                  <th className="py-3 px-4 text-xs font-semibold text-slate-500 uppercase tracking-widest border-b border-slate-800">{t('phone')}</th>
+                  <th className="py-3 px-4 text-xs font-semibold text-slate-500 uppercase tracking-widest border-b border-slate-800">{t('source')}</th>
+                  <th className="py-3 px-4 text-xs font-semibold text-slate-500 uppercase tracking-widest border-b border-slate-800">{t('status')}</th>
+                  <th className="py-3 px-4 text-xs font-semibold text-slate-500 uppercase tracking-widest border-b border-slate-800">{t('score')}</th>
+                  <th className="py-3 px-4 text-xs font-semibold text-slate-500 uppercase tracking-widest border-b border-slate-800 text-right">{t('actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/50">
@@ -197,52 +200,52 @@ export default function LeadsPage() {
               <CardContent className="p-6 space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1.5">First Name *</label>
+                    <label className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1.5">{t('first_name')} *</label>
                     <input className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#D4AF37]/50" 
                            value={form.first_name} onChange={e => setForm(f => ({ ...f, first_name: e.target.value }))} />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1.5">Last Name</label>
+                    <label className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1.5">{t('last_name')}</label>
                     <input className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#D4AF37]/50" 
                            value={form.last_name} onChange={e => setForm(f => ({ ...f, last_name: e.target.value }))} />
                   </div>
                 </div>
                 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1.5">Email</label>
+                  <label className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1.5">{t('email')}</label>
                   <input className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#D4AF37]/50" 
                          type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} />
                 </div>
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1.5">Phone</label>
+                    <label className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1.5">{t('phone')}</label>
                     <input className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#D4AF37]/50" 
                            value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1.5">Company</label>
+                    <label className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1.5">{t('company')}</label>
                     <input className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#D4AF37]/50" 
                            value={form.company} onChange={e => setForm(f => ({ ...f, company: e.target.value }))} />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1.5">Title</label>
+                  <label className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1.5">{t('title')}</label>
                   <input className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#D4AF37]/50" 
                          value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1.5">Status</label>
+                    <label className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1.5">{t('status')}</label>
                     <select className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#D4AF37]/50" 
                             value={form.status} onChange={e => setForm(f => ({ ...f, status: e.target.value }))}>
                       {['new','contacted','qualified','proposal','negotiation'].map(s => <option key={s} value={s}>{s}</option>)}
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1.5">Source</label>
+                    <label className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1.5">{t('source')}</label>
                     <select className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#D4AF37]/50" 
                             value={form.source} onChange={e => setForm(f => ({ ...f, source: e.target.value }))}>
                       {['manual','email','phone','website','referral','linkedin','zoho','other'].map(s => <option key={s} value={s}>{s}</option>)}
@@ -252,7 +255,7 @@ export default function LeadsPage() {
 
                 <div className="flex justify-end gap-3 pt-4 border-t border-slate-800 mt-6">
                   <Button variant="ghost" onClick={() => setShowForm(false)}>Cancel</Button>
-                  <Button className="bg-[#D4AF37] text-slate-950 hover:bg-[#D4AF37]/90" onClick={handleCreate} disabled={!form.first_name}>Create Lead</Button>
+                  <Button className="bg-[#D4AF37] text-slate-950 hover:bg-[#D4AF37]/90" onClick={handleCreate} disabled={!form.first_name}>{t('new_lead')}</Button>
                 </div>
               </CardContent>
             </Card>
