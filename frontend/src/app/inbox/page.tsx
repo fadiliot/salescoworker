@@ -200,7 +200,7 @@ export default function InboxPage() {
                       </div>
                       {selected.sentiment && (
                         <Badge variant="outline" className="border-slate-800 bg-slate-900 gap-1.5 font-medium uppercase tracking-wider text-[10px]">
-                          <SentimentIndicator s={selected.sentiment} /> {t(selected.sentiment)}
+                          <SentimentIndicator s={selected.sentiment} /> {t(selected.sentiment as any)}
                         </Badge>
                       )}
                     </div>
