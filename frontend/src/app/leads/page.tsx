@@ -67,11 +67,12 @@ export default function LeadsPage() {
     try {
       const newLead = await createLead(form)
       setLeads(prev => [newLead, ...prev])
-    } catch {
-      setLeads(prev => [{ id: Date.now().toString(), ...form, score: 30, is_hot: 'false', created_at: new Date().toISOString() } as any, ...prev])
+      setShowForm(false)
+      setForm({ first_name: '', last_name: '', email: '', phone: '', company: '', title: '', status: 'new', source: 'manual' })
+    } catch (err: any) {
+      const msg = err.response?.data?.detail || "Failed to create lead. Please check the information and try again."
+      alert(msg)
     }
-    setShowForm(false)
-    setForm({ first_name: '', last_name: '', email: '', phone: '', company: '', title: '', status: 'new', source: 'manual' })
   }
 
   const handleScoreAll = async () => {
