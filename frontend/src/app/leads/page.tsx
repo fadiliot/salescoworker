@@ -8,12 +8,12 @@ import { Badge } from '@/components/ui/badge'
 import { Search, Plus, Filter, Bot, Mail, Trash2, Zap } from 'lucide-react'
 
 const DUMMY_LEADS = [
-  { id: '1', first_name: 'Sarah', last_name: 'Chen', email: 'sarah.chen@techcorp.io', company: 'TechCorp Inc', title: 'VP of Operations', status: 'qualified', source: 'email', score: 85, is_hot: 'true', phone: '+1-555-0101', created_at: new Date().toISOString() },
-  { id: '2', first_name: 'Marcus', last_name: 'Williams', email: 'm.williams@finova.com', company: 'Finova Capital', title: 'CFO', status: 'proposal', source: 'referral', score: 72, is_hot: 'true', phone: '+1-555-0102', created_at: new Date().toISOString() },
-  { id: '3', first_name: 'Priya', last_name: 'Patel', email: 'priya@growthlab.co', company: 'GrowthLab', title: 'CEO', status: 'contacted', source: 'website', score: 61, is_hot: 'false', phone: '+1-555-0103', created_at: new Date().toISOString() },
-  { id: '4', first_name: 'James', last_name: "O'Brien", email: 'jobrien@retailmax.com', company: 'RetailMax', title: 'Procurement Manager', status: 'new', source: 'linkedin', score: 45, is_hot: 'false', phone: '+1-555-0104', created_at: new Date().toISOString() },
-  { id: '5', first_name: 'Aisha', last_name: 'Diallo', email: 'aisha.d@scalex.ai', company: 'ScaleX AI', title: 'CTO', status: 'negotiation', source: 'email', score: 91, is_hot: 'true', phone: '+1-555-0105', created_at: new Date().toISOString() },
-  { id: '6', first_name: 'Tom', last_name: 'Hanks', email: 'tom.hanks@movieprod.net', company: 'Movie Productions', title: 'Director', status: 'won', source: 'referral', score: 98, is_hot: 'false', phone: '+1-555-0106', created_at: new Date().toISOString() },
+  { id: '550e8400-e29b-41d4-a716-446655440001', first_name: 'Sarah', last_name: 'Chen', email: 'sarah.chen@techcorp.io', company: 'TechCorp Inc', title: 'VP of Operations', status: 'qualified', source: 'email', score: 85, is_hot: 'true', phone: '+1-555-0101', created_at: "2026-04-05T10:00:00Z" },
+  { id: '550e8400-e29b-41d4-a716-446655440002', first_name: 'Marcus', last_name: 'Williams', email: 'm.williams@finova.com', company: 'Finova Capital', title: 'CFO', status: 'proposal', source: 'referral', score: 72, is_hot: 'true', phone: '+1-555-0102', created_at: "2026-04-05T09:00:00Z" },
+  { id: '550e8400-e29b-41d4-a716-446655440003', first_name: 'Priya', last_name: 'Patel', email: 'priya@growthlab.co', company: 'GrowthLab', title: 'CEO', status: 'contacted', source: 'website', score: 61, is_hot: 'false', phone: '+1-555-0103', created_at: "2026-04-04T12:00:00Z" },
+  { id: '550e8400-e29b-41d4-a716-446655440004', first_name: 'James', last_name: "O'Brien", email: 'jobrien@retailmax.com', company: 'RetailMax', title: 'Procurement Manager', status: 'new', source: 'linkedin', score: 45, is_hot: 'false', phone: '+1-555-0104', created_at: "2026-04-04T11:00:00Z" },
+  { id: '550e8400-e29b-41d4-a716-446655440005', first_name: 'Aisha', last_name: 'Diallo', email: 'aisha.d@scalex.ai', company: 'ScaleX AI', title: 'CTO', status: 'negotiation', source: 'email', score: 91, is_hot: 'true', phone: '+1-555-0105', created_at: "2026-04-03T15:00:00Z" },
+  { id: '550e8400-e29b-41d4-a716-446655440006', first_name: 'Tom', last_name: 'Hanks', email: 'tom.hanks@movieprod.net', company: 'Movie Productions', title: 'Director', status: 'won', source: 'referral', score: 98, is_hot: 'false', phone: '+1-555-0106', created_at: "2026-04-01T09:00:00Z" },
 ]
 
 const STATUSES = ['all', 'new', 'contacted', 'qualified', 'proposal', 'negotiation', 'won', 'lost']
@@ -44,10 +44,14 @@ export default function LeadsPage() {
   const [showForm, setShowForm] = useState(false)
   const [scoring, setScoring] = useState(false)
   const [form, setForm] = useState({ first_name: '', last_name: '', email: '', phone: '', company: '', title: '', status: 'new', source: 'manual' })
+  const [isMounted, setIsMounted] = useState(false)
 
   useEffect(() => {
+    setIsMounted(true)
     getLeads().then((data: any) => { if (Array.isArray(data) && data.length) setLeads(data) }).catch(() => {})
   }, [])
+
+  if (!isMounted) return <div className="min-h-screen bg-slate-950" />
 
   const filtered = leads.filter(l => {
     const name = `${l.first_name} ${l.last_name}`.toLowerCase()

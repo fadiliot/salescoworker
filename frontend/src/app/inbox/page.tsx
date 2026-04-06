@@ -9,11 +9,11 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 
 const DUMMY_EMAILS = [
-  { id: 'e1', from_address: 'sarah.chen@techcorp.io', subject: 'Re: Enterprise License Pricing', body_text: "Hi, I reviewed the proposal. The pricing looks good but I need to discuss the implementation timeline with my team. Can we schedule a call this week? Also, do you offer any flexibility on the setup fee?", direction: 'inbound', is_read: false, ai_summary: 'Sarah wants to discuss implementation timeline and setup fee flexibility.', sentiment: 'positive', received_at: new Date(Date.now() - 3600000).toISOString() },
-  { id: 'e2', from_address: 'aisha.d@scalex.ai', subject: 'Final approval pending board sign-off', body_text: "Great news! The board loved the demo. We're at the final approval stage. Expecting sign-off by Friday. Please prepare the final contract with the terms we agreed on last Tuesday.", direction: 'inbound', is_read: false, ai_summary: 'Board approved. Needs final contract by Friday. Hot deal — priority action.', sentiment: 'positive', received_at: new Date(Date.now() - 7200000).toISOString() },
-  { id: 'e3', from_address: 'm.williams@finova.com', subject: 'Urgent: Contract Terms Review', body_text: "We've reviewed your contract terms. There are a few clauses regarding data privacy and SLA that our legal team has flagged. Can you clarify sections 4.2 and 7.1?", direction: 'inbound', is_read: false, ai_summary: 'Legal team flagged contract clauses 4.2 and 7.1. Urgent response needed.', sentiment: 'neutral', received_at: new Date(Date.now() - 14400000).toISOString() },
-  { id: 'e4', from_address: 'dkim@nexacloud.com', subject: 'Interested in your platform', body_text: "Hello, I came across your platform and I'm very interested. We're a cloud startup looking for a CRM solution. Could you send me pricing info and schedule a quick demo?", direction: 'inbound', is_read: false, ai_summary: 'NexaCloud CEO interested in pricing and demo. New inbound lead.', sentiment: 'positive', received_at: new Date(Date.now() - 86400000).toISOString() },
-  { id: 'e5', from_address: 'emily.j@healthplus.org', subject: 'Question about enterprise features', body_text: "Hi there, We're a healthcare organization looking at your solution. Can you tell me more about your compliance certifications (HIPAA, SOC2) and how data is encrypted at rest?", direction: 'inbound', is_read: true, ai_summary: 'HealthPlus asking about HIPAA and SOC2 compliance.', sentiment: 'neutral', received_at: new Date(Date.now() - 172800000).toISOString() },
+  { id: 'a1828062-8e7a-4c28-9844-3158c5c7d0a1', from_address: 'sarah.chen@techcorp.io', subject: 'Re: Enterprise License Pricing', body_text: "Hi, I reviewed the proposal. The pricing looks good but I need to discuss the implementation timeline with my team. Can we schedule a call this week? Also, do you offer any flexibility on the setup fee?", direction: 'inbound', is_read: false, ai_summary: 'Sarah wants to discuss implementation timeline and setup fee flexibility.', sentiment: 'positive', received_at: "2026-04-06T10:00:00Z" },
+  { id: 'a1828062-8e7a-4c28-9844-3158c5c7d0a2', from_address: 'aisha.d@scalex.ai', subject: 'Final approval pending board sign-off', body_text: "Great news! The board loved the demo. We're at the final approval stage. Expecting sign-off by Friday. Please prepare the final contract with the terms we agreed on last Tuesday.", direction: 'inbound', is_read: false, ai_summary: 'Board approved. Needs final contract by Friday. Hot deal — priority action.', sentiment: 'positive', received_at: "2026-04-06T09:00:00Z" },
+  { id: 'a1828062-8e7a-4c28-9844-3158c5c7d0a3', from_address: 'm.williams@finova.com', subject: 'Urgent: Contract Terms Review', body_text: "We've reviewed your contract terms. There are a few clauses regarding data privacy and SLA that our legal team has flagged. Can you clarify sections 4.2 and 7.1?", direction: 'inbound', is_read: false, ai_summary: 'Legal team flagged contract clauses 4.2 and 7.1. Urgent response needed.', sentiment: 'neutral', received_at: "2026-04-06T07:00:00Z" },
+  { id: 'a1828062-8e7a-4c28-9844-3158c5c7d0a4', from_address: 'dkim@nexacloud.com', subject: 'Interested in your platform', body_text: "Hello, I came across your platform and I'm very interested. We're a cloud startup looking for a CRM solution. Could you send me pricing info and schedule a quick demo?", direction: 'inbound', is_read: false, ai_summary: 'NexaCloud CEO interested in pricing and demo. New inbound lead.', sentiment: 'positive', received_at: "2026-04-05T12:00:00Z" },
+  { id: 'a1828062-8e7a-4c28-9844-3158c5c7d0a5', from_address: 'emily.j@healthplus.org', subject: 'Question about enterprise features', body_text: "Hi there, We're a healthcare organization looking at your solution. Can you tell me more about your compliance certifications (HIPAA, SOC2) and how data is encrypted at rest?", direction: 'inbound', is_read: true, ai_summary: 'HealthPlus asking about HIPAA and SOC2 compliance.', sentiment: 'neutral', received_at: "2026-04-04T15:00:00Z" },
 ]
 
 function SentimentIndicator({ s }: { s: string }) {
@@ -35,8 +35,10 @@ export default function InboxPage() {
   const [composeTo, setComposeTo] = useState('')
   const [composeSubject, setComposeSubject] = useState('')
   const [composeBody, setComposeBody] = useState('')
+  const [isMounted, setIsMounted] = useState(false)
 
   useEffect(() => {
+    setIsMounted(true)
     getEmails().then((data: any) => { 
       if (Array.isArray(data) && data.length) {
         const normalized = data.map((e: any) => ({
@@ -96,6 +98,8 @@ export default function InboxPage() {
 
   const handleSync = async () => { setSyncing(true); try { await syncEmails() } catch {}; setTimeout(() => setSyncing(false), 2000) }
   const unreadCount = emails.filter(e => !e.is_read).length
+
+  if (!isMounted) return <div className="min-h-screen bg-slate-950" />
 
   return (
     <div className="flex min-h-screen bg-slate-950 text-slate-50">

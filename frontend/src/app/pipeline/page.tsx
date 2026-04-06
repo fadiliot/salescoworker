@@ -18,25 +18,25 @@ const STAGES = [
 ]
 
 const DUMMY_DEALS = [
-  { id: '1', title: 'Al Habtoor Group — CRM Suite', stage: 'proposal', amount: '165000', currency: 'AED', probability: '70', notes: 'Discussing implementation timeline', lead_id: '1' },
-  { id: '2', title: 'Emirates NBD — Integration Platform', stage: 'negotiation', amount: '440000', currency: 'AED', probability: '85', notes: 'Legal reviewing contract clauses', lead_id: '2' },
-  { id: '3', title: 'Damac Properties — Lead Mgmt', stage: 'contacted', amount: '31000', currency: 'AED', probability: '40', notes: 'Initial interest shown', lead_id: '3' },
-  { id: '4', title: 'Majid Al Futtaim — AI Platform', stage: 'negotiation', amount: '349000', currency: 'AED', probability: '90', notes: 'Board sign-off pending this Friday', lead_id: '4' },
-  { id: '5', title: 'Dubai Holding — SaaS Bundle', stage: 'won', amount: '80000', currency: 'AED', probability: '100', notes: 'Contract signed!', lead_id: '5' },
-  { id: '6', title: 'ADNOC Digital — Workflow Tool', stage: 'new', amount: '66000', currency: 'AED', probability: '20', notes: 'Early exploratory stage', lead_id: '6' },
+  { id: '8c2a9d8f-4e1b-4f7c-9b1d-2a8b3c4d5e61', title: 'Al Habtoor Group — CRM Suite', stage: 'proposal', amount: '165000', currency: 'AED', probability: '70', notes: 'Discussing implementation timeline', lead_id: '550e8400-e29b-41d4-a716-446655440001' },
+  { id: '8c2a9d8f-4e1b-4f7c-9b1d-2a8b3c4d5e62', title: 'Emirates NBD — Integration Platform', stage: 'negotiation', amount: '440000', currency: 'AED', probability: '85', notes: 'Legal reviewing contract clauses', lead_id: '550e8400-e29b-41d4-a716-446655440002' },
+  { id: '8c2a9d8f-4e1b-4f7c-9b1d-2a8b3c4d5e63', title: 'Damac Properties — Lead Mgmt', stage: 'contacted', amount: '31000', currency: 'AED', probability: '40', notes: 'Initial interest shown', lead_id: '550e8400-e29b-41d4-a716-446655440003' },
+  { id: '8c2a9d8f-4e1b-4f7c-9b1d-2a8b3c4d5e64', title: 'Majid Al Futtaim — AI Platform', stage: 'negotiation', amount: '349000', currency: 'AED', probability: '90', notes: 'Board sign-off pending this Friday', lead_id: '550e8400-e29b-41d4-a716-446655440004' },
+  { id: '8c2a9d8f-4e1b-4f7c-9b1d-2a8b3c4d5e65', title: 'Dubai Holding — SaaS Bundle', stage: 'won', amount: '80000', currency: 'AED', probability: '100', notes: 'Contract signed!', lead_id: '550e8400-e29b-41d4-a716-446655440005' },
+  { id: '8c2a9d8f-4e1b-4f7c-9b1d-2a8b3c4d5e66', title: 'ADNOC Digital — Workflow Tool', stage: 'new', amount: '66000', currency: 'AED', probability: '20', notes: 'Early exploratory stage', lead_id: '550e8400-e29b-41d4-a716-446655440006' },
 ]
 
 const DUMMY_CONTACTS: Record<string, any[]> = {
-  '1': [
+  '8c2a9d8f-4e1b-4f7c-9b1d-2a8b3c4d5e61': [
     { id: 'c1', first_name: 'Khalid', last_name: 'Al Habtoor', title: 'Group CEO', email: 'k.habtoor@alhabtoor.ae', role_type: 'Economic Buyer' },
     { id: 'c2', first_name: 'Sara', last_name: 'Al Mansoori', title: 'IT Director', email: 'sara.m@alhabtoor.ae', role_type: 'Champion' },
   ],
-  '2': [
+  '8c2a9d8f-4e1b-4f7c-9b1d-2a8b3c4d5e62': [
     { id: 'c3', first_name: 'Mohammed', last_name: 'Al Gergawi', title: 'SVP Technology', email: 'm.gergawi@emiratesnbd.com', role_type: 'Economic Buyer' },
     { id: 'c4', first_name: 'Fatima', last_name: 'Al Rashidi', title: 'Procurement Manager', email: 'fatima.r@emiratesnbd.com', role_type: 'Gatekeeper' },
     { id: 'c5', first_name: 'Rania', last_name: 'Khouri', title: 'Legal Counsel', email: 'r.khouri@emiratesnbd.com', role_type: 'Legal' },
   ],
-  '4': [
+  '8c2a9d8f-4e1b-4f7c-9b1d-2a8b3c4d5e64': [
     { id: 'c6', first_name: 'Alain', last_name: 'Bejjani', title: 'Group CEO', email: 'a.bejjani@maf.ae', role_type: 'Economic Buyer' },
     { id: 'c7', first_name: 'Nour', last_name: 'Saleh', title: 'Head of Innovation', email: 'n.saleh@maf.ae', role_type: 'Evaluator' },
   ],
@@ -49,10 +49,14 @@ export default function PipelinePage() {
   const [showForm, setShowForm] = useState(false)
   const [selectedDeal, setSelectedDeal] = useState<any | null>(null)
   const [form, setForm] = useState({ title: '', stage: 'new', amount: '', currency: 'AED', probability: '', notes: '' })
+  const [isMounted, setIsMounted] = useState(false)
 
   useEffect(() => {
+    setIsMounted(true)
     getDeals().then((data: any) => { if (Array.isArray(data) && data.length) setDeals(data) }).catch(() => {})
   }, [])
+
+  if (!isMounted) return <div className="min-h-screen bg-slate-950" />
 
   const dealsByStage = (stage: string) => deals.filter(d => d.stage === stage)
   const totalPipeline = deals.reduce((sum, d) => sum + (parseFloat(d.amount) || 0), 0)

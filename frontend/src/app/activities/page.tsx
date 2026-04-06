@@ -9,11 +9,11 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 
 const DUMMY_ACTIVITIES = [
-  { id: 'a1', activity_type: 'call', title: 'Discovery call with Sarah Chen', description: 'Discussed enterprise plan features and pricing', outcome: 'Positive - scheduling demo next week', occurred_at: new Date(Date.now() - 3600000).toISOString(), caller_number: '+1-555-0101', duration_seconds: '840' },
-  { id: 'a2', activity_type: 'email', title: 'Sent proposal to Finova Capital', description: 'Sent detailed 3-year contract proposal', outcome: 'Delivered successfully', occurred_at: new Date(Date.now() - 7200000).toISOString() },
-  { id: 'a3', activity_type: 'meeting', title: 'Product demo for ScaleX AI', description: 'Full platform walkthrough for the board', outcome: 'Board approved! Contract coming soon', occurred_at: new Date(Date.now() - 86400000).toISOString() },
-  { id: 'a4', activity_type: 'call', title: 'Follow-up call with NexaCloud', description: 'Discussed cloud integration requirements', outcome: 'Moving to proposal stage', occurred_at: new Date(Date.now() - 172800000).toISOString(), duration_seconds: '600' },
-  { id: 'a5', activity_type: 'note', title: 'Research - AutoHaus GmbH', description: 'Researched company background and key decision makers', occurred_at: new Date(Date.now() - 259200000).toISOString() },
+  { id: '8c2a9d8f-4e1b-4f7c-9b1d-2a8b3c4d5e61', activity_type: 'call', title: 'Discovery call with Sarah Chen', description: 'Discussed enterprise plan features and pricing', outcome: 'Positive - scheduling demo next week', occurred_at: "2026-04-06T11:00:00Z", caller_number: '+1-555-0101', duration_seconds: '840' },
+  { id: '8c2a9d8f-4e1b-4f7c-9b1d-2a8b3c4d5e62', activity_type: 'email', title: 'Sent proposal to Finova Capital', description: 'Sent detailed 3-year contract proposal', outcome: 'Delivered successfully', occurred_at: "2026-04-06T10:00:00Z" },
+  { id: '8c2a9d8f-4e1b-4f7c-9b1d-2a8b3c4d5e63', activity_type: 'meeting', title: 'Product demo for ScaleX AI', description: 'Full platform walkthrough for the board', outcome: 'Board approved! Contract coming soon', occurred_at: "2026-04-05T14:00:00Z" },
+  { id: '8c2a9d8f-4e1b-4f7c-9b1d-2a8b3c4d5e64', activity_type: 'call', title: 'Follow-up call with NexaCloud', description: 'Discussed cloud integration requirements', outcome: 'Moving to proposal stage', occurred_at: "2026-04-04T11:00:00Z", duration_seconds: '600' },
+  { id: '8c2a9d8f-4e1b-4f7c-9b1d-2a8b3c4d5e65', activity_type: 'note', title: 'Research - AutoHaus GmbH', description: 'Researched company background and key decision makers', occurred_at: "2026-04-03T09:00:00Z" },
 ]
 
 const ActivityIcons: any = { call: Phone, email: Mail, meeting: Users, note: FileText, task: CheckSquare }
@@ -31,11 +31,15 @@ export default function ActivitiesPage() {
   const [showForm, setShowForm] = useState(false)
   const [filter, setFilter] = useState('all')
   const [form, setForm] = useState({ activity_type: 'call', title: '', description: '', outcome: '' })
+  const [isMounted, setIsMounted] = useState(false)
 
   useEffect(() => {
+    setIsMounted(true)
     getActivities().then((data: any) => { if (Array.isArray(data) && data.length) setActivities(data) }).catch(() => {})
     getRecentCalls().then((d: any) => { if (d.calls?.length) setCalls(d.calls) }).catch(() => {})
   }, [])
+
+  if (!isMounted) return <div className="min-h-screen bg-slate-950" />
 
   const filtered = activities.filter(a => filter === 'all' || a.activity_type === filter)
 

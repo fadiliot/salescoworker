@@ -16,24 +16,24 @@ import { Button } from '@/components/ui/button'
 const DUMMY_STATS = {
   summary: { total_leads: 10, hot_leads: 4, new_leads: 3, total_deals: 8, won_deals: 1, win_rate: 12.5, total_emails: 5, unread_emails: 3, pending_reminders: 5, overdue_reminders: 0 },
   recent_leads: [
-    { id: '1', name: 'Sarah Chen', company: 'Al Habtoor Group', email: 'sarah@alhabtoor.ae', score: 85, status: 'qualified', is_hot: 'true', created_at: new Date(Date.now()-3600000).toISOString() },
-    { id: '2', name: 'Aisha Diallo', company: 'Emirates NBD', email: 'aisha@emiratesnbd.ae', score: 91, status: 'negotiation', is_hot: 'true', created_at: new Date(Date.now()-7200000).toISOString() },
-    { id: '3', name: 'Marcus Williams', company: 'Damac Properties', email: 'm.williams@damac.com', score: 72, status: 'proposal', is_hot: 'true', created_at: new Date(Date.now()-86400000).toISOString() },
-    { id: '4', name: 'David Kim', company: 'Majid Al Futtaim', email: 'dkim@maf.ae', score: 79, status: 'proposal', is_hot: 'true', created_at: new Date(Date.now()-172800000).toISOString() },
-    { id: '5', name: 'Priya Patel', company: 'Dubai Holding', email: 'priya@dubaiholding.co', score: 61, status: 'contacted', is_hot: 'false', created_at: new Date(Date.now()-259200000).toISOString() },
+    { id: '550e8400-e29b-41d4-a716-446655440001', name: 'Sarah Chen', company: 'Al Habtoor Group', email: 'sarah@alhabtoor.ae', score: 85, status: 'qualified', is_hot: 'true', created_at: "2026-04-06T11:00:00Z" },
+    { id: '550e8400-e29b-41d4-a716-446655440002', name: 'Aisha Diallo', company: 'Emirates NBD', email: 'aisha@emiratesnbd.ae', score: 91, status: 'negotiation', is_hot: 'true', created_at: "2026-04-06T09:00:00Z" },
+    { id: '550e8400-e29b-41d4-a716-446655440003', name: 'Marcus Williams', company: 'Damac Properties', email: 'm.williams@damac.com', score: 72, status: 'proposal', is_hot: 'true', created_at: "2026-04-05T12:00:00Z" },
+    { id: '550e8400-e29b-41d4-a716-446655440004', name: 'David Kim', company: 'Majid Al Futtaim', email: 'dkim@maf.ae', score: 79, status: 'proposal', is_hot: 'true', created_at: "2026-04-04T15:00:00Z" },
+    { id: '550e8400-e29b-41d4-a716-446655440005', name: 'Priya Patel', company: 'Dubai Holding', email: 'priya@dubaiholding.co', score: 61, status: 'contacted', is_hot: 'false', created_at: "2026-04-03T10:00:00Z" },
   ],
   recent_emails: [
-    { id: 'e1', from: 'sarah@alhabtoor.ae', subject: 'Re: Enterprise License Pricing', summary: 'Wants to discuss implementation timeline.', is_read: false, received_at: new Date(Date.now()-3600000).toISOString() },
-    { id: 'e2', from: 'aisha@emiratesnbd.ae', subject: 'Final approval pending board sign-off', summary: 'Board approved the deal! Contract needed.', is_read: false, received_at: new Date(Date.now()-7200000).toISOString() },
-    { id: 'e3', from: 'm.williams@damac.com', subject: 'Urgent: Contract Terms Review', summary: 'Legal team flagged contract clauses 4.2.', is_read: false, received_at: new Date(Date.now()-14400000).toISOString() },
+    { id: 'a1828062-8e7a-4c28-9844-3158c5c7d0a1', from: 'sarah@alhabtoor.ae', subject: 'Re: Enterprise License Pricing', summary: 'Wants to discuss implementation timeline.', is_read: false, received_at: "2026-04-06T12:00:00Z" },
+    { id: 'a1828062-8e7a-4c28-9844-3158c5c7d0a2', from: 'aisha@emiratesnbd.ae', subject: 'Final approval pending board sign-off', summary: 'Board approved the deal! Contract needed.', is_read: false, received_at: "2026-04-06T11:00:00Z" },
+    { id: 'a1828062-8e7a-4c28-9844-3158c5c7d0a3', from: 'm.williams@damac.com', subject: 'Urgent: Contract Terms Review', summary: 'Legal team flagged contract clauses 4.2.', is_read: false, received_at: "2026-04-06T09:00:00Z" },
   ],
 }
 
 const DUMMY_REMINDERS = [
-  { id: 'r1', title: 'Call Sarah Chen re: timeline', message: 'Follow up on implementation timeline discussion', due_at: new Date(Date.now()+7200000).toISOString(), is_completed: false },
-  { id: 'r2', title: 'Send revised contract to Emirates NBD', message: 'Address sections 4.2 and 7.1', due_at: new Date(Date.now()+18000000).toISOString(), is_completed: false },
-  { id: 'r3', title: 'Contract prep for Damac', message: 'Finalize contract terms for board approval', due_at: new Date(Date.now()+3600000).toISOString(), is_completed: false },
-  { id: 'r4', title: 'Demo prep for MAF', message: 'Personalized demo for David Kim', due_at: new Date(Date.now()+86400000).toISOString(), is_completed: false },
+  { id: '7b2b6c7a-5b6d-47a3-b4d5-8f6a39d89b11', title: 'Call Sarah Chen re: timeline', message: 'Follow up on implementation timeline discussion', due_at: "2026-04-06T15:00:00Z", is_completed: false },
+  { id: '7b2b6c7a-5b6d-47a3-b4d5-8f6a29d89b22', title: 'Send revised contract to Emirates NBD', message: 'Address sections 4.2 and 7.1', due_at: "2026-04-07T10:00:00Z", is_completed: false },
+  { id: '7b2b6c7a-5b6d-47a3-b4d5-8f6a19d89b33', title: 'Contract prep for Damac', message: 'Finalize contract terms for board approval', due_at: "2026-04-06T14:00:00Z", is_completed: false },
+  { id: '7b2b6c7a-5b6d-47a3-b4d5-8f6a09d89b44', title: 'Demo prep for MAF', message: 'Personalized demo for David Kim', due_at: "2026-04-08T09:00:00Z", is_completed: false },
 ]
 
 const DUMMY_INSIGHTS = {
@@ -51,13 +51,17 @@ export default function Dashboard() {
   const [insights, setInsights] = useState(DUMMY_INSIGHTS)
   const [meetings, setMeetings] = useState<any[]>([])
   const [syncing, setSyncing] = useState(false)
+  const [isMounted, setIsMounted] = useState(false)
 
   useEffect(() => {
+    setIsMounted(true)
     getDashboardStats().then(setStats).catch(() => {})
     getReminders({ upcoming_only: true }).then((data: any) => { if (Array.isArray(data) && data.length) setReminders(data) }).catch(() => {})
     getPipelineInsights().then(setInsights).catch(() => {})
     getUpcomingMeetings().then((data: any) => { if (Array.isArray(data?.events)) setMeetings(data.events) }).catch(() => {})
   }, [])
+
+  if (!isMounted) return <div className="min-h-screen bg-slate-950" />
 
   const handleSync = async () => {
     setSyncing(true)

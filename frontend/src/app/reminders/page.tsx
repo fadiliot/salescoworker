@@ -9,12 +9,12 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 
 const DUMMY_REMINDERS = [
-  { id: 'r1', title: 'Call Sarah Chen re: timeline', message: 'Follow up on implementation timeline discussion', due_at: new Date(Date.now() + 7200000).toISOString(), is_completed: false, lead_id: null },
-  { id: 'r2', title: 'Send revised contract to Finova', message: 'Address sections 4.2 and 7.1 raised by legal', due_at: new Date(Date.now() + 18000000).toISOString(), is_completed: false, lead_id: null },
-  { id: 'r3', title: 'Contract prep for ScaleX AI', message: 'Finalize contract terms for board approval — urgent!', due_at: new Date(Date.now() + 3600000).toISOString(), is_completed: false, lead_id: null },
-  { id: 'r4', title: 'Demo prep for NexaCloud', message: 'Personalized demo for David Kim', due_at: new Date(Date.now() + 86400000).toISOString(), is_completed: false, lead_id: null },
-  { id: 'r5', title: 'Follow up with Carlos Rivera', message: 'Check logistics integration requirements', due_at: new Date(Date.now() + 172800000).toISOString(), is_completed: false, lead_id: null },
-  { id: 'r6', title: 'Check in with HealthPlus', message: 'Send HIPAA compliance documentation', due_at: new Date(Date.now() - 3600000).toISOString(), is_completed: false, lead_id: null },
+  { id: '7b2b6c7a-5b6d-47a3-b4d5-8f6a39d89b11', title: 'Call Sarah Chen re: timeline', message: 'Follow up on implementation timeline discussion', due_at: "2026-04-10T10:00:00Z", is_completed: false, lead_id: null },
+  { id: '7b2b6c7a-5b6d-47a3-b4d5-8f6a39d89b12', title: 'Send revised contract to Finova', message: 'Address sections 4.2 and 7.1 raised by legal', due_at: "2026-04-11T14:30:00Z", is_completed: false, lead_id: null },
+  { id: '7b2b6c7a-5b6d-47a3-b4d5-8f6a39d89b13', title: 'Contract prep for ScaleX AI', message: 'Finalize contract terms for board approval — urgent!', due_at: "2026-04-09T09:00:00Z", is_completed: false, lead_id: null },
+  { id: '7b2b6c7a-5b6d-47a3-b4d5-8f6a39d89b14', title: 'Demo prep for NexaCloud', message: 'Personalized demo for David Kim', due_at: "2026-04-12T11:00:00Z", is_completed: false, lead_id: null },
+  { id: '7b2b6c7a-5b6d-47a3-b4d5-8f6a39d89b15', title: 'Follow up with Carlos Rivera', message: 'Check logistics integration requirements', due_at: "2026-04-15T08:00:00Z", is_completed: false, lead_id: null },
+  { id: '7b2b6c7a-5b6d-47a3-b4d5-8f6a39d89b16', title: 'Check in with HealthPlus', message: 'Send HIPAA compliance documentation', due_at: "2026-04-05T16:00:00Z", is_completed: false, lead_id: null },
 ]
 
 export default function RemindersPage() {
@@ -22,10 +22,14 @@ export default function RemindersPage() {
   const [showForm, setShowForm] = useState(false)
   const [tab, setTab] = useState<'active' | 'completed'>('active')
   const [form, setForm] = useState({ title: '', message: '', due_at: '' })
+  const [isMounted, setIsMounted] = useState(false)
 
   useEffect(() => {
+    setIsMounted(true)
     getReminders().then((data: any) => { if (Array.isArray(data) && data.length) setReminders(data) }).catch(() => {})
   }, [])
+
+  if (!isMounted) return <div className="min-h-screen bg-slate-950" />
 
   const active = reminders.filter(r => !r.is_completed)
   const completed = reminders.filter(r => r.is_completed)
