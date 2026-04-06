@@ -164,7 +164,7 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent className="flex-1">
               <div className="space-y-6">
-                {stats.recent_leads.map(lead => (
+                {stats.recent_leads.map((lead: any) => (
                   <div key={lead.id} className="flex items-center group cursor-pointer" onClick={() => window.location.href = `/leads/${lead.id}`}>
                     <div className="w-10 h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center font-bold text-sm text-[#D4AF37]">
                       {lead.name?.charAt(0) || '?'}
@@ -205,7 +205,7 @@ export default function Dashboard() {
                   <div className="h-full bg-gradient-to-r from-[#D4AF37] to-emerald-500 rounded-full" style={{ width: `${insights.health_score}%` }}></div>
                 </div>
                 <ul className="space-y-3">
-                  {insights.insights.map((ins, i) => (
+                  {insights.insights.map((ins: any, i: number) => (
                     <li key={i} className="text-xs text-slate-300 leading-relaxed border-l-2 border-[#D4AF37]/30 pl-3 py-0.5">
                       {ins}
                     </li>
@@ -242,7 +242,7 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {reminders.map(rem => {
+                {reminders.map((rem: any) => {
                   const isOverdue = new Date(rem.due_at) < new Date()
                   return (
                     <div key={rem.id} className="flex items-start justify-between gap-4 py-2 border-b border-slate-800 last:border-0 group">
@@ -273,7 +273,7 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               <div className="space-y-0">
-                {stats.recent_emails.map(email => (
+                {stats.recent_emails.map((email: any) => (
                   <div key={email.id} className="flex items-start gap-3 p-3 -mx-3 rounded-lg hover:bg-slate-800/50 cursor-pointer transition-colors" onClick={() => window.location.href = '/inbox'}>
                     <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center font-bold text-xs text-blue-400 shrink-0">
                       {email.from?.charAt(0)?.toUpperCase() || '?'}
