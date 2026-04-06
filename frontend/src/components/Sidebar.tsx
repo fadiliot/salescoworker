@@ -35,8 +35,8 @@ export default function Sidebar() {
   useEffect(() => {
     const tick = () => setTimeStr(new Date().toLocaleTimeString('en-AE', { hour: '2-digit', minute: '2-digit', hour12: true, timeZone: 'Asia/Dubai' }))
     tick()
-    const t = setInterval(tick, 30000)
-    return () => clearInterval(t)
+    const interval = setInterval(tick, 30000)
+    return () => clearInterval(interval)
   }, [])
 
   return (
@@ -62,7 +62,6 @@ export default function Sidebar() {
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#D4AF37] opacity-40"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-[#D4AF37]"></span>
-            </span>
             </span>
             {t('dubai')} — {timeStr}
           </div>
