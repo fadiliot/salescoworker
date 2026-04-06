@@ -11,24 +11,26 @@ import { Badge } from '@/components/ui/badge'
 
 import { useLanguage } from '@/context/LanguageContext'
 
-const NAV_ITEMS = [
-  { href: '/', icon: LayoutDashboard, label: 'Dashboard' },
-  { href: '/leads', icon: Target, label: 'Leads', badge: null },
-  { href: '/pipeline', icon: KanbanSquare, label: 'Pipeline' },
-  { href: '/inbox', icon: Mail, label: 'Inbox', badge: '5', badgeType: '' },
-  { href: '/activities', icon: Activity, label: 'Activities' },
-  { href: '/reminders', icon: Bell, label: 'Reminders', badge: '2', badgeType: 'hot' },
-]
-
-const BOTTOM_ITEMS = [
-  { href: '/settings', icon: Settings, label: 'Settings' },
-]
+// NAV_ITEMS moved inside component to use translations
 
 export default function Sidebar() {
   const pathname = usePathname()
-  const { lang, setLanguage, dir } = useLanguage()
+  const { lang, setLanguage, dir, t } = useLanguage()
   const [pbxOnline, setPbxOnline] = useState(true)
   const [timeStr, setTimeStr] = useState('')
+
+  const NAV_ITEMS = [
+    { href: '/', icon: LayoutDashboard, label: t('dashboard') },
+    { href: '/leads', icon: Target, label: t('leads'), badge: null },
+    { href: '/pipeline', icon: KanbanSquare, label: t('pipeline') },
+    { href: '/inbox', icon: Mail, label: t('inbox'), badge: '5', badgeType: '' },
+    { href: '/activities', icon: Activity, label: t('activities') },
+    { href: '/reminders', icon: Bell, label: t('reminders'), badge: '2', badgeType: 'hot' },
+  ]
+  
+  const BOTTOM_ITEMS = [
+    { href: '/settings', icon: Settings, label: t('settings') },
+  ]
 
   useEffect(() => {
     const tick = () => setTimeStr(new Date().toLocaleTimeString('en-AE', { hour: '2-digit', minute: '2-digit', hour12: true, timeZone: 'Asia/Dubai' }))
@@ -61,9 +63,10 @@ export default function Sidebar() {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#D4AF37] opacity-40"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-[#D4AF37]"></span>
             </span>
-            Dubai — {timeStr}
+            </span>
+            {t('dubai')} — {timeStr}
           </div>
-          <div className="text-[10px] text-slate-500 font-medium">Next: Maghrib ~18:43</div>
+          <div className="text-[10px] text-slate-500 font-medium">{t('next')}: {t('maghrib')} ~18:43</div>
         </div>
       </div>
 
@@ -84,7 +87,7 @@ export default function Sidebar() {
       {/* Navigation */}
       <nav className="flex-1 px-3 py-4 space-y-8 overflow-y-auto">
         <div className="space-y-1">
-          <p className="px-3 text-[10px] font-bold tracking-widest text-slate-500 mb-3">WORKSPACE</p>
+          <p className="px-3 text-[10px] font-bold tracking-widest text-slate-500 mb-3 uppercase">{t('workspace')}</p>
           {NAV_ITEMS.map((item) => {
             const Icon = item.icon
             const isActive = pathname === item.href
@@ -108,7 +111,7 @@ export default function Sidebar() {
         </div>
 
         <div className="space-y-1">
-          <p className="px-3 text-[10px] font-bold tracking-widest text-slate-500 mb-3">SYSTEM</p>
+          <p className="px-3 text-[10px] font-bold tracking-widest text-slate-500 mb-3 uppercase">{t('system')}</p>
           {BOTTOM_ITEMS.map((item) => {
             const Icon = item.icon
             const isActive = pathname === item.href
@@ -142,9 +145,9 @@ export default function Sidebar() {
             </span>
             <div className="text-left">
               <p className={cn("text-xs font-bold", pbxOnline ? "text-emerald-500" : "text-red-500")}>
-                {pbxOnline ? 'PBX Online' : 'PBX Offline'}
+                {pbxOnline ? t('pbx_online') : t('pbx_offline')}
               </p>
-              <p className="text-[10px] text-slate-500 mt-0.5">Yeastar Integration</p>
+              <p className="text-[10px] text-slate-500 mt-0.5">{t('yeastar_int')}</p>
             </div>
           </div>
           <PhoneCall className={cn("w-4 h-4", pbxOnline ? "text-emerald-500/50" : "text-red-500/50")} />
@@ -158,7 +161,7 @@ export default function Sidebar() {
           <div className="flex-1 min-w-0">
             <p className="text-sm font-bold text-slate-200 truncate">Fadil Anwar</p>
             <p className="text-xs text-[#D4AF37] flex items-center gap-1">
-              <CheckCircle2 className="w-3 h-3" /> Gold Tier
+              <CheckCircle2 className="w-3 h-3" /> {t('gold_tier')}
             </p>
           </div>
         </div>

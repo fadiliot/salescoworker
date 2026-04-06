@@ -46,6 +46,7 @@ const DUMMY_INSIGHTS = {
 }
 
 export default function Dashboard() {
+  const { t, lang } = useLanguage()
   const [stats, setStats] = useState(DUMMY_STATS)
   const [reminders, setReminders] = useState(DUMMY_REMINDERS)
   const [insights, setInsights] = useState(DUMMY_INSIGHTS)
@@ -82,18 +83,18 @@ export default function Dashboard() {
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-white mb-1">Dashboard</h1>
+            <h1 className="text-3xl font-bold tracking-tight text-white mb-1">{t('dashboard')}</h1>
             <p className="text-sm text-slate-400">
-              {format(new Date(), 'EEEE, MMMM d, yyyy')} — Here's your UAE pipeline overview.
+              {format(new Date(), 'EEEE, MMMM d, yyyy')} — {t('uae_overview')}
             </p>
           </div>
           <div className="flex items-center gap-3">
             <Button variant="outline" className="border-[#D4AF37]/20 text-[#D4AF37] hover:bg-[#D4AF37]/10 bg-transparent" onClick={handleSync} disabled={syncing}>
               <RefreshCw className={`mr-2 h-4 w-4 ${syncing ? 'animate-spin' : ''}`} />
-              {syncing ? 'Syncing...' : 'Sync Data'}
+              {syncing ? '...' : t('sync_data')}
             </Button>
             <Button className="bg-gradient-to-r from-[#D4AF37] to-[#B8963E] text-slate-950 hover:opacity-90 transition-opacity">
-              <Plus className="mr-2 h-4 w-4" /> New Lead
+              <Plus className="mr-2 h-4 w-4" /> {t('new_lead')}
             </Button>
           </div>
         </div>
@@ -103,13 +104,13 @@ export default function Dashboard() {
           <Card className="bg-slate-900 border-slate-800 shadow-sm relative overflow-hidden group">
             <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-[#D4AF37] to-transparent opacity-50 group-hover:opacity-100 transition-opacity" />
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-slate-400">Total Pipeline</CardTitle>
+              <CardTitle className="text-sm font-medium text-slate-400">{t('total_pipeline')}</CardTitle>
               <DollarSign className="h-4 w-4 text-[#D4AF37]" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-white">AED 2.5M</div>
               <p className="text-xs text-emerald-500 mt-1 flex items-center">
-                <ArrowUpRight className="w-3 h-3 mr-1" /> +20.1% from last month
+                <ArrowUpRight className="w-3 h-3 ms-1" /> +20.1%
               </p>
             </CardContent>
           </Card>
@@ -117,34 +118,34 @@ export default function Dashboard() {
           <Card className="bg-slate-900 border-slate-800 shadow-sm relative overflow-hidden group">
             <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-orange-500 to-transparent opacity-50 group-hover:opacity-100 transition-opacity" />
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-slate-400">Hot Leads</CardTitle>
+              <CardTitle className="text-sm font-medium text-slate-400">{t('leads')}</CardTitle>
               <Flame className="h-4 w-4 text-orange-500" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-white">{stats.summary.hot_leads}</div>
-              <p className="text-xs text-orange-400 mt-1">Action required immediately</p>
+              <p className="text-xs text-orange-400 mt-1">{t('hot_leads_desc')}</p>
             </CardContent>
           </Card>
 
           <Card className="bg-slate-900 border-slate-800 shadow-sm">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-slate-400">Active Deals</CardTitle>
+              <CardTitle className="text-sm font-medium text-slate-400">{t('active_deals')}</CardTitle>
               <Activity className="h-4 w-4 text-emerald-500" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-white">{stats.summary.total_deals}</div>
-              <p className="text-xs text-slate-500 mt-1">{stats.summary.win_rate}% current period win rate</p>
+              <p className="text-xs text-slate-500 mt-1">{stats.summary.win_rate}%</p>
             </CardContent>
           </Card>
 
           <Card className="bg-slate-900 border-slate-800 shadow-sm">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-slate-400">Unread Emails</CardTitle>
+              <CardTitle className="text-sm font-medium text-slate-400">{t('unread_emails')}</CardTitle>
               <Mail className="h-4 w-4 text-blue-400" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-white">{stats.summary.unread_emails}</div>
-              <p className="text-xs text-slate-500 mt-1">Awaiting your reply</p>
+              <p className="text-xs text-slate-500 mt-1">{t('inbox')}</p>
             </CardContent>
           </Card>
         </div>
@@ -156,9 +157,9 @@ export default function Dashboard() {
           <Card className="col-span-4 bg-slate-900 border-slate-800 flex flex-col">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Flame className="w-5 h-5 text-orange-500" /> Hot Leads
+                <Flame className="w-5 h-5 text-orange-500" /> {t('leads')}
               </CardTitle>
-              <CardDescription>Accounts showing the highest intent score this week.</CardDescription>
+              <CardDescription>{t('hot_leads_desc')}</CardDescription>
             </CardHeader>
             <CardContent className="flex-1">
               <div className="space-y-6">
@@ -194,7 +195,7 @@ export default function Dashboard() {
             <Card className="bg-gradient-to-br from-slate-900 to-slate-950 border-[#D4AF37]/20 shadow-[0_0_30px_rgba(212,175,55,0.05)]">
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center justify-between text-[#D4AF37]">
-                  <span className="flex items-center gap-2 text-sm font-semibold tracking-wide uppercase"><Presentation className="w-4 h-4" /> AI Pipeline Analysis</span>
+                  <span className="flex items-center gap-2 text-sm font-semibold tracking-wide uppercase"><Presentation className="w-4 h-4" /> {t('ai_analysis')}</span>
                   <span className="text-2xl font-black">{insights.health_score}</span>
                 </CardTitle>
               </CardHeader>
@@ -216,8 +217,8 @@ export default function Dashboard() {
             <Card className="bg-slate-900 border-slate-800 flex flex-col h-full">
               <CardHeader className="pb-3 flex flex-row items-center justify-between">
                 <div>
-                  <CardTitle className="text-base font-semibold">Upcoming Meetings</CardTitle>
-                  <CardDescription>Click for AI Pre-Meeting Tear Sheets</CardDescription>
+                  <CardTitle className="text-base font-semibold">{t('upcoming_meetings')}</CardTitle>
+                  <CardDescription>AI intelligence briefings</CardDescription>
                 </div>
                 <Button variant="ghost" size="sm" className="h-8 text-xs text-[#D4AF37] hover:text-[#D4AF37] hover:bg-[#D4AF37]/10">See all <ArrowRight className="w-3 h-3 ms-1" /></Button>
               </CardHeader>
@@ -235,7 +236,7 @@ export default function Dashboard() {
           <Card className="bg-slate-900 border-slate-800">
             <CardHeader className="pb-3">
               <CardTitle className="text-base font-semibold flex items-center gap-2">
-                <Bell className="w-4 h-4 text-emerald-400" /> Today's Reminders
+                <Bell className="w-4 h-4 text-emerald-400" /> {t('today_reminders')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -265,9 +266,9 @@ export default function Dashboard() {
           <Card className="bg-slate-900 border-slate-800">
             <CardHeader className="pb-3 flex flex-row items-center justify-between">
               <CardTitle className="text-base font-semibold flex items-center gap-2">
-                <Mail className="w-4 h-4 text-blue-400" /> Recent Emails
+                <Mail className="w-4 h-4 text-blue-400" /> {t('recent_emails')}
               </CardTitle>
-              <Button variant="ghost" size="sm" className="h-8 text-xs text-slate-400 hover:text-white">Open Inbox</Button>
+              <Button variant="ghost" size="sm" className="h-8 text-xs text-slate-400 hover:text-white" onClick={() => window.location.href = '/inbox'}>{t('inbox')}</Button>
             </CardHeader>
             <CardContent>
               <div className="space-y-0">
