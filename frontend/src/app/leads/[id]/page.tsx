@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import Sidebar from '@/components/Sidebar'
-import { getLead, getNextActions, getActivities } from '@/lib/api'
+import { getLead, getLeadNextActions, getActivities } from '@/lib/api'
 import { format } from 'date-fns'
 import { 
   User, Building2, Mail, Phone, Globe, Calendar, 
@@ -26,7 +26,7 @@ export default function LeadDetailPage() {
     if (!id) return
     Promise.all([
       getLead(id as string),
-      getNextActions(id as string),
+      getLeadNextActions(id as string),
       getActivities() // Simple fallback for timeline
     ]).then(([leadData, actionData, activityData]) => {
       setLead(leadData)
