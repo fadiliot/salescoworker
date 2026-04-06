@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import Sidebar from '@/components/Sidebar'
+import { useLanguage } from '@/context/LanguageContext'
 import MeetingWidget from '@/components/MeetingWidget'
 import { getDashboardStats, getReminders, completeReminder, syncIntegrations, getPipelineInsights, getUpcomingMeetings } from '@/lib/api'
 import { format, formatDistanceToNow } from 'date-fns'
