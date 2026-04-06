@@ -8,6 +8,8 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 
+import { useLanguage } from '@/context/LanguageContext'
+
 const DUMMY_EMAILS = [
   { id: 'a1828062-8e7a-4c28-9844-3158c5c7d0a1', from_address: 'sarah.chen@techcorp.io', subject: 'Re: Enterprise License Pricing', body_text: "Hi, I reviewed the proposal. The pricing looks good but I need to discuss the implementation timeline with my team. Can we schedule a call this week? Also, do you offer any flexibility on the setup fee?", direction: 'inbound', is_read: false, ai_summary: 'Sarah wants to discuss implementation timeline and setup fee flexibility.', sentiment: 'positive', received_at: "2026-04-06T10:00:00Z" },
   { id: 'a1828062-8e7a-4c28-9844-3158c5c7d0a2', from_address: 'aisha.d@scalex.ai', subject: 'Final approval pending board sign-off', body_text: "Great news! The board loved the demo. We're at the final approval stage. Expecting sign-off by Friday. Please prepare the final contract with the terms we agreed on last Tuesday.", direction: 'inbound', is_read: false, ai_summary: 'Board approved. Needs final contract by Friday. Hot deal — priority action.', sentiment: 'positive', received_at: "2026-04-06T09:00:00Z" },
@@ -23,6 +25,7 @@ function SentimentIndicator({ s }: { s: string }) {
 }
 
 export default function InboxPage() {
+  const { t } = useLanguage()
   const [emails, setEmails] = useState(DUMMY_EMAILS)
   const [selected, setSelected] = useState<typeof DUMMY_EMAILS[0] | null>(null)
   const [suggestedReply, setSuggestedReply] = useState('')
@@ -111,23 +114,24 @@ export default function InboxPage() {
           <div className="w-[400px] shrink-0 border-r border-slate-800 flex flex-col bg-slate-900/50">
             <div className="p-6 border-b border-slate-800 shrink-0">
               <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <h1 className="text-2xl font-bold tracking-tight text-white flex items-center">
-                    Inbox <Badge className="ml-3 bg-[#D4AF37]/10 text-[#D4AF37] border-[#D4AF37]/20 pointer-events-none hover:bg-[#D4AF37]/10 text-xs px-2">{unreadCount} unread</Badge>
-                  </h1>
-                </div>
-                <div className="flex gap-2">
-                  <Button size="icon" variant="outline" className="border-slate-800 bg-slate-900 text-slate-400 hover:text-white shrink-0" onClick={handleSync} disabled={syncing}>
-                    <RefreshCw className={`w-4 h-4 ${syncing ? 'animate-spin' : ''}`} />
-                  </Button>
-                  <Button size="icon" className="bg-[#D4AF37] hover:bg-[#B8963E] text-slate-950 shrink-0" onClick={handleCompose}>
-                    <Edit3 className="w-4 h-4" />
-                  </Button>
+                <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 shrink-0 gap-4">
+                  <div>
+                    <h1 className="text-3xl font-bold tracking-tight text-white mb-2">{t('inbox')}</h1>
+                    <p className="text-sm text-slate-400">{t('unread_emails')}: {unreadCount}</p>
+                  </div>
+                  <div className="flex gap-3">
+                    <Button variant="outline" className="bg-slate-900 border-slate-800 text-slate-300 hover:text-white" onClick={handleSync} disabled={syncing}>
+                      <RefreshCw className={`mr-2 h-4 w-4 ${syncing ? 'animate-spin' : ''}`} /> {syncing ? '...' : t('sync_data')}
+                    </Button>
+                    <Button className="bg-[#D4AF37] text-slate-950 hover:bg-[#B8963E]" onClick={() => setIsComposing(true)}>
+                      <Edit3 className="mr-2 h-4 w-4" /> {t('new_lead')}
+                    </Button>
+                  </div>
                 </div>
               </div>
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
-                <input className="w-full bg-slate-950 border border-slate-800 rounded-lg pl-9 pr-4 py-2 text-sm focus:outline-none focus:border-[#D4AF37]/50" placeholder="Search emails..." />
+                <input className="w-full bg-slate-950 border border-slate-800 rounded-lg pl-9 pr-4 py-2 text-sm focus:outline-none focus:border-[#D4AF37]/50" placeholder={t('search_emails')} />
               </div>
             </div>
 
@@ -166,15 +170,15 @@ export default function InboxPage() {
             {isComposing ? (
               <div className="p-10 max-w-3xl mx-auto w-full flex flex-col h-full overflow-y-auto">
                 <div className="flex items-center justify-between mb-8">
-                  <h2 className="text-2xl font-bold text-white">New Message</h2>
-                  <Button variant="ghost" onClick={() => setIsComposing(false)}>Cancel</Button>
+                  <h2 className="text-2xl font-bold text-white">{t('new_message')}</h2>
+                  <Button variant="ghost" onClick={() => setIsComposing(false)}>{t('cancel')}</Button>
                 </div>
                 <div className="space-y-4">
-                  <input className="w-full bg-slate-900 border border-slate-800 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-[#D4AF37]/50" placeholder="To: recipient@example.com" value={composeTo} onChange={e => setComposeTo(e.target.value)} />
-                  <input className="w-full bg-slate-900 border border-slate-800 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-[#D4AF37]/50" placeholder="Subject" value={composeSubject} onChange={e => setComposeSubject(e.target.value)} />
-                  <textarea className="w-full bg-slate-900 border border-slate-800 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-[#D4AF37]/50 min-h-[300px]" placeholder="Type your message here..." value={composeBody} onChange={e => setComposeBody(e.target.value)} />
+                  <input className="w-full bg-slate-900 border border-slate-800 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-[#D4AF37]/50" placeholder={t('to')} value={composeTo} onChange={e => setComposeTo(e.target.value)} />
+                  <input className="w-full bg-slate-900 border border-slate-800 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-[#D4AF37]/50" placeholder={t('subject')} value={composeSubject} onChange={e => setComposeSubject(e.target.value)} />
+                  <textarea className="w-full bg-slate-900 border border-slate-800 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-[#D4AF37]/50 min-h-[300px]" placeholder={t('type_message')} value={composeBody} onChange={e => setComposeBody(e.target.value)} />
                   <div className="pt-2">
-                    <Button className="bg-[#D4AF37] text-slate-950 hover:bg-[#D4AF37]/90 px-8" onClick={handleSendNew} disabled={sending}>{sending ? 'Sending...' : 'Send Message'}</Button>
+                    <Button className="bg-[#D4AF37] text-slate-950 hover:bg-[#D4AF37]/90 px-8" onClick={handleSendNew} disabled={sending}>{sending ? t('sending') : t('send_message')}</Button>
                   </div>
                 </div>
               </div>
@@ -196,7 +200,7 @@ export default function InboxPage() {
                       </div>
                       {selected.sentiment && (
                         <Badge variant="outline" className="border-slate-800 bg-slate-900 gap-1.5 font-medium uppercase tracking-wider text-[10px]">
-                          <SentimentIndicator s={selected.sentiment} /> {selected.sentiment}
+                          <SentimentIndicator s={selected.sentiment} /> {t(selected.sentiment)}
                         </Badge>
                       )}
                     </div>
@@ -209,17 +213,17 @@ export default function InboxPage() {
 
                   {/* Reply Action */}
                   <div className="mt-auto border-t border-slate-800 pt-6">
-                    <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Compose Reply</h3>
+                    <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">{t('compose_reply')}</h3>
                     <textarea 
                       className="w-full bg-slate-900 border border-slate-800 rounded-lg px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-[#D4AF37]/50 min-h-[140px] mb-4 placeholder:text-slate-600" 
-                      placeholder="Type your reply here..." 
+                      placeholder={t('type_reply')} 
                       value={replyText} 
                       onChange={e => setReplyText(e.target.value)} 
                     />
                     <div className="flex gap-3">
-                      <Button className="bg-[#D4AF37] text-slate-950 hover:bg-[#D4AF37]/90 px-6" onClick={handleSend} disabled={!replyText || sending}>{sending ? 'Sending...' : 'Send Reply'}</Button>
+                      <Button className="bg-[#D4AF37] text-slate-950 hover:bg-[#D4AF37]/90 px-6" onClick={handleSend} disabled={!replyText || sending}>{sending ? t('sending') : t('send_reply')}</Button>
                       <Button variant="outline" className="border-slate-700 bg-slate-900 text-slate-300" onClick={handleSuggest} disabled={loading}>
-                        {loading ? 'Thinking...' : <><Zap className="w-4 h-4 mr-2" /> Auto-Draft AI Reply</>}
+                        {loading ? t('thinking') : <><Zap className="w-4 h-4 mr-2" /> {t('auto_draft')}</>}
                       </Button>
                     </div>
                   </div>
@@ -228,13 +232,13 @@ export default function InboxPage() {
                 {/* AI Assistant Right Sidebar */}
                 <div className="w-[320px] bg-slate-950 p-6 overflow-y-auto flex flex-col gap-6 shrink-0 custom-scrollbar">
                   <div className="text-[10px] font-bold text-[#D4AF37] uppercase tracking-widest flex items-center gap-2 mb-2">
-                    <Bot className="w-3.5 h-3.5" /> Sales Co-worker
+                    <Bot className="w-3.5 h-3.5" /> {t('sales_coworker')}
                   </div>
 
                   {/* AI Summary Card */}
                   {selected.ai_summary && (
                     <div className="bg-indigo-500/5 border border-indigo-500/20 rounded-xl p-4">
-                      <h3 className="text-xs font-bold text-indigo-400 uppercase tracking-wider mb-2 flex items-center gap-1.5"><FileText className="w-3.5 h-3.5" /> Intel</h3>
+                      <h3 className="text-xs font-bold text-indigo-400 uppercase tracking-wider mb-2 flex items-center gap-1.5"><FileText className="w-3.5 h-3.5" /> {t('intel')}</h3>
                       <p className="text-[13px] text-indigo-200/80 leading-relaxed">{selected.ai_summary}</p>
                     </div>
                   )}
@@ -242,16 +246,16 @@ export default function InboxPage() {
                   {/* Generated Suggested Reply */}
                   {suggestedReply && (
                     <div className="bg-[#D4AF37]/5 border border-[#D4AF37]/30 rounded-xl p-4">
-                      <h3 className="text-xs font-bold text-[#D4AF37] uppercase tracking-wider mb-3 flex items-center gap-1.5"><Zap className="w-3.5 h-3.5" /> Draft Ready</h3>
+                      <h3 className="text-xs font-bold text-[#D4AF37] uppercase tracking-wider mb-3 flex items-center gap-1.5"><Zap className="w-3.5 h-3.5" /> {t('draft_ready')}</h3>
                       <p className="text-[12px] text-slate-300 leading-relaxed italic border-l-2 border-[#D4AF37]/50 pl-3 mb-4 line-clamp-6">{suggestedReply}</p>
-                      <Button variant="outline" size="sm" className="w-full border-[#D4AF37]/50 text-[#D4AF37] hover:bg-[#D4AF37]/10" onClick={() => setReplyText(suggestedReply)}>Apply Draft</Button>
+                      <Button variant="outline" size="sm" className="w-full border-[#D4AF37]/50 text-[#D4AF37] hover:bg-[#D4AF37]/10" onClick={() => setReplyText(suggestedReply)}>{t('apply_draft')}</Button>
                     </div>
                   )}
 
                   {/* Extracted Lead Output */}
                   {extractedLead && (
                     <div className="bg-emerald-500/5 border border-emerald-500/30 rounded-xl p-4">
-                      <h3 className="text-xs font-bold text-emerald-500 uppercase tracking-wider mb-3 flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5" /> Lead Extracted</h3>
+                      <h3 className="text-xs font-bold text-emerald-500 uppercase tracking-wider mb-3 flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5" /> {t('lead_extracted')}</h3>
                       <div className="space-y-2 mb-4">
                         {Object.entries(extractedLead).map(([k, v]) => (
                           <div key={k} className="flex flex-col">
@@ -260,19 +264,19 @@ export default function InboxPage() {
                           </div>
                         ))}
                       </div>
-                      <Button className="w-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/50 hover:bg-emerald-500/30" onClick={() => window.location.href = '/leads'} size="sm">Add to CRM</Button>
+                      <Button className="w-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/50 hover:bg-emerald-500/30" onClick={() => window.location.href = '/leads'} size="sm">{t('add_to_crm')}</Button>
                     </div>
                   )}
 
                   {/* Quick Toolbox */}
                   <div className="mt-auto pt-6 border-t border-slate-800">
-                    <h3 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-3">Toolbox</h3>
+                    <h3 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-3">{t('toolbox')}</h3>
                     <div className="space-y-2">
                       <Button variant="ghost" size="sm" className="w-full justify-start text-xs text-slate-400 hover:text-white" onClick={handleSuggest}>
-                        <Zap className="mr-2 w-3.5 h-3.5" /> Generate AI Reply
+                        <Zap className="mr-2 w-3.5 h-3.5" /> {t('generate_ai_reply')}
                       </Button>
                       <Button variant="ghost" size="sm" className="w-full justify-start text-xs text-slate-400 hover:text-white" onClick={handleExtract}>
-                        <Search className="mr-2 w-3.5 h-3.5" /> Parse Lead Data
+                        <Search className="mr-2 w-3.5 h-3.5" /> {t('parse_lead_data')}
                       </Button>
                     </div>
                   </div>
@@ -280,9 +284,11 @@ export default function InboxPage() {
               </div>
             ) : (
               <div className="flex-1 flex flex-col items-center justify-center p-12 text-center bg-slate-950">
-                <Mail className="w-16 h-16 text-slate-800 mb-6" />
-                <h3 className="text-xl font-bold text-white mb-2">Your Sales Inbox</h3>
-                <p className="text-slate-500 text-sm max-w-xs">Select an email from the list to read it, generate AI drafts, and automatically extract pipeline leads.</p>
+                <div className="p-16 text-center text-slate-500">
+                  <Mail className="w-16 h-16 mx-auto text-slate-800 mb-4" />
+                  <h3 className="text-slate-300 font-semibold mb-1">{t('no_messages')}</h3>
+                  <p className="text-slate-500 text-sm max-w-xs">{t('select_email_hint')}</p>
+                </div>
               </div>
             )}
           </div>

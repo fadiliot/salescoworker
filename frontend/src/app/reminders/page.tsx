@@ -8,6 +8,8 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 
+import { useLanguage } from '@/context/LanguageContext'
+
 const DUMMY_REMINDERS = [
   { id: '7b2b6c7a-5b6d-47a3-b4d5-8f6a39d89b11', title: 'Call Sarah Chen re: timeline', message: 'Follow up on implementation timeline discussion', due_at: "2026-04-10T10:00:00Z", is_completed: false, lead_id: null },
   { id: '7b2b6c7a-5b6d-47a3-b4d5-8f6a39d89b12', title: 'Send revised contract to Finova', message: 'Address sections 4.2 and 7.1 raised by legal', due_at: "2026-04-11T14:30:00Z", is_completed: false, lead_id: null },
@@ -18,6 +20,7 @@ const DUMMY_REMINDERS = [
 ]
 
 export default function RemindersPage() {
+  const { t } = useLanguage()
   const [reminders, setReminders] = useState(DUMMY_REMINDERS)
   const [showForm, setShowForm] = useState(false)
   const [tab, setTab] = useState<'active' | 'completed'>('active')
@@ -65,11 +68,11 @@ export default function RemindersPage() {
         
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 shrink-0">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-white mb-2">Reminders</h1>
-            <p className="text-sm text-slate-400">Never miss a follow-up. You have {active.length} active tasks.</p>
+            <h1 className="text-3xl font-bold tracking-tight text-white mb-2">{t('reminders')}</h1>
+            <p className="text-sm text-slate-400">{t('upcoming_meetings')} · {active.length} {t('pending').toLowerCase()}</p>
           </div>
           <Button className="bg-gradient-to-r from-[#D4AF37] to-[#B8963E] text-slate-950 hover:opacity-90 transition-opacity mt-4 md:mt-0" onClick={() => setShowForm(true)}>
-            <Plus className="mr-2 h-4 w-4" /> New Reminder
+            <Plus className="mr-2 h-4 w-4" /> {t('schedule')}
           </Button>
         </div>
 
@@ -86,11 +89,11 @@ export default function RemindersPage() {
         <div className="flex gap-2 mb-6 shrink-0 border-b border-slate-800 pb-4">
           <Button variant="ghost" onClick={() => setTab('active')} 
             className={`text-sm ${tab === 'active' ? 'bg-slate-800 text-white font-bold' : 'text-slate-400'}`}>
-            <Bell className="w-4 h-4 mr-2" /> Pending ({active.length})
+            <Bell className="w-4 h-4 mr-2" /> {t('pending')} ({active.length})
           </Button>
           <Button variant="ghost" onClick={() => setTab('completed')} 
             className={`text-sm ${tab === 'completed' ? 'bg-slate-800 text-white font-bold' : 'text-slate-400'}`}>
-             <CheckCircle2 className="w-4 h-4 mr-2" /> Completed ({completed.length})
+             <CheckCircle2 className="w-4 h-4 mr-2" /> {t('completed')} ({completed.length})
           </Button>
         </div>
 
@@ -111,7 +114,7 @@ export default function RemindersPage() {
                      {rem.message && <p className="text-sm text-slate-400 mb-3">{rem.message}</p>}
                      <div className="flex items-center gap-2">
                        <Badge variant="outline" className={`text-[10px] font-semibold border-transparent uppercase tracking-wider px-2 py-0.5 ${u.bg} ${u.color}`}>
-                         {rem.is_completed ? 'Finished' : isPast(new Date(rem.due_at)) ? 'Overdue' : 'Scheduled'}
+                         {rem.is_completed ? t('completed') : isPast(new Date(rem.due_at)) ? 'Overdue' : t('schedule')}
                        </Badge>
                        <span className={`text-[11px] font-bold flex items-center gap-1 ${u.color}`}>
                          <Clock className="w-3 h-3" /> 
@@ -148,21 +151,21 @@ export default function RemindersPage() {
           <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4" onClick={e => { if (e.target === e.currentTarget) setShowForm(false) }}>
              <Card className="w-full max-w-md bg-slate-900 border border-slate-700 shadow-2xl">
                <div className="p-6 border-b border-slate-800">
-                 <h2 className="text-lg font-bold text-white">Create Reminder</h2>
+                 <h2 className="text-lg font-bold text-white">{t('schedule')}</h2>
                </div>
                <CardContent className="p-6 space-y-4">
                  <div>
-                    <label className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1.5">Action Title *</label>
+                    <label className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1.5">{t('deal_title')} *</label>
                     <input className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#D4AF37]/50" 
                            value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} autoFocus />
                  </div>
                  <div>
-                    <label className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1.5">Context</label>
+                    <label className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1.5">{t('notes')}</label>
                     <textarea className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#D4AF37]/50 min-h-[80px]" 
                            value={form.message} onChange={e => setForm(f => ({ ...f, message: e.target.value }))} />
                  </div>
                  <div>
-                    <label className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1.5">Due Date & Time *</label>
+                    <label className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1.5">{t('due')} *</label>
                     <input className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#D4AF37]/50" 
                            type="datetime-local" value={form.due_at} onChange={e => setForm(f => ({ ...f, due_at: e.target.value }))} />
                  </div>

@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { RefreshCw, CheckCircle2, Zap, Settings, ArrowRight, Server, Link as LinkIcon } from 'lucide-react'
 
+import { useLanguage } from '@/context/LanguageContext'
+
 const INTEGRATIONS = [
   { key: 'zoho_crm', name: 'Zoho CRM', icon: '🔵', desc: 'Sync leads, contacts, and deals bidirectionally', authKey: 'zoho' },
   { key: 'microsoft_outlook', name: 'Microsoft Outlook', icon: '🟦', desc: 'Read emails, send replies via Microsoft Graph API', authKey: 'microsoft' },
@@ -14,6 +16,7 @@ const INTEGRATIONS = [
 ]
 
 export default function SettingsPage() {
+  const { t } = useLanguage()
   const [statuses, setStatuses] = useState<Record<string, boolean>>({})
   const [syncing, setSyncing] = useState(false)
   const [flash, setFlash] = useState('')
@@ -52,11 +55,11 @@ export default function SettingsPage() {
         
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 shrink-0">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-white mb-2">Platform Settings</h1>
-            <p className="text-sm text-slate-400">Manage third-party integrations, triggers and AI configurations.</p>
+            <h1 className="text-3xl font-bold tracking-tight text-white mb-2">{t('settings')}</h1>
+            <p className="text-sm text-slate-400">{t('uae_overview')}</p>
           </div>
           <Button className="bg-[#D4AF37] text-slate-950 hover:bg-[#B8963E] transition-colors mt-4 md:mt-0" onClick={handleSync} disabled={syncing}>
-            <RefreshCw className={`mr-2 h-4 w-4 ${syncing ? 'animate-spin' : ''}`} /> {syncing ? 'Syncing Data...' : 'Sync All Data'}
+            <RefreshCw className={`mr-2 h-4 w-4 ${syncing ? 'animate-spin' : ''}`} /> {syncing ? '...' : t('sync_data')}
           </Button>
         </div>
 
@@ -72,7 +75,7 @@ export default function SettingsPage() {
           
           {/* Active Integrations */}
           <section>
-            <h2 className="text-lg font-bold text-slate-200 mb-4 flex items-center gap-2"><LinkIcon className="w-5 h-5 text-[#D4AF37]" /> Connected Platforms</h2>
+            <h2 className="text-lg font-bold text-slate-200 mb-4 flex items-center gap-2"><LinkIcon className="w-5 h-5 text-[#D4AF37]" /> {t('workspace')}</h2>
             <div className="grid gap-4">
               {INTEGRATIONS.map(intg => {
                 const connected = statuses[intg.key]
@@ -91,7 +94,7 @@ export default function SettingsPage() {
                       <div className="flex items-center gap-4 shrink-0 sm:ml-4">
                         <Badge variant="outline" className={`shrink-0 ${connected ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' : 'bg-slate-950 text-slate-500 border-slate-800'}`}>
                           <div className={`w-2 h-2 rounded-full mr-2 ${connected ? 'bg-emerald-400' : 'bg-slate-600'}`} />
-                          {connected ? 'Connected' : 'Disconnected'}
+                          {connected ? t('completed') : t('pending')}
                         </Badge>
                         {intg.authKey ? (
                            <Button variant={connected ? "outline" : "default"} size="sm" 
@@ -114,7 +117,7 @@ export default function SettingsPage() {
 
           {/* Development / Auth Config */}
           <section>
-            <h2 className="text-lg font-bold text-slate-200 mb-4 flex items-center gap-2"><Settings className="w-5 h-5 text-slate-400" /> Backend Environment Variables</h2>
+            <h2 className="text-lg font-bold text-slate-200 mb-4 flex items-center gap-2"><Settings className="w-5 h-5 text-slate-400" /> {t('system')}</h2>
             <Card className="bg-slate-900 border-slate-800 shadow-none">
               <CardContent className="p-6">
                 <p className="text-sm text-slate-400 mb-6">
