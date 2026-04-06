@@ -41,7 +41,7 @@ function StatusBadge({ status }: { status: string }) {
 
 export default function LeadsPage() {
   const { t } = useLanguage()
-  const [leads, setLeads] = useState(DUMMY_LEADS)
+  const [leads, setLeads] = useState<any[]>([])
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [showForm, setShowForm] = useState(false)
@@ -51,7 +51,7 @@ export default function LeadsPage() {
 
   useEffect(() => {
     setIsMounted(true)
-    getLeads().then((data: any) => { if (Array.isArray(data) && data.length) setLeads(data) }).catch(() => {})
+    getLeads().then((data: any) => { if (Array.isArray(data)) setLeads(data) }).catch(() => {})
   }, [])
 
   if (!isMounted) return <div className="min-h-screen bg-slate-950" />

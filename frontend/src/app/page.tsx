@@ -48,9 +48,9 @@ const DUMMY_INSIGHTS = {
 
 export default function Dashboard() {
   const { t, lang } = useLanguage()
-  const [stats, setStats] = useState(DUMMY_STATS)
-  const [reminders, setReminders] = useState(DUMMY_REMINDERS)
-  const [insights, setInsights] = useState(DUMMY_INSIGHTS)
+  const [stats, setStats] = useState<any>({ summary: { total_leads: 0, hot_leads: 0, new_leads: 0, total_deals: 0, won_deals: 0, win_rate: 0, total_emails: 0, unread_emails: 0, pending_reminders: 0, overdue_reminders: 0 }, recent_leads: [], recent_emails: [] })
+  const [reminders, setReminders] = useState<any[]>([])
+  const [insights, setInsights] = useState<any>({ health_score: 0, insights: [] })
   const [meetings, setMeetings] = useState<any[]>([])
   const [syncing, setSyncing] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
@@ -58,7 +58,7 @@ export default function Dashboard() {
   useEffect(() => {
     setIsMounted(true)
     getDashboardStats().then(setStats).catch(() => {})
-    getReminders({ upcoming_only: true }).then((data: any) => { if (Array.isArray(data) && data.length) setReminders(data) }).catch(() => {})
+    getReminders({ upcoming_only: true }).then((data: any) => { if (Array.isArray(data)) setReminders(data) }).catch(() => {})
     getPipelineInsights().then(setInsights).catch(() => {})
     getUpcomingMeetings().then((data: any) => { if (Array.isArray(data?.events)) setMeetings(data.events) }).catch(() => {})
   }, [])

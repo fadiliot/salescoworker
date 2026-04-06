@@ -29,7 +29,7 @@ const ActivityStyles: any = {
 
 export default function ActivitiesPage() {
   const { t } = useLanguage()
-  const [activities, setActivities] = useState(DUMMY_ACTIVITIES)
+  const [activities, setActivities] = useState<any[]>([])
   const [calls, setCalls] = useState<any[]>([])
   const [showForm, setShowForm] = useState(false)
   const [filter, setFilter] = useState('all')
@@ -38,7 +38,7 @@ export default function ActivitiesPage() {
 
   useEffect(() => {
     setIsMounted(true)
-    getActivities().then((data: any) => { if (Array.isArray(data) && data.length) setActivities(data) }).catch(() => {})
+    getActivities().then((data: any) => { if (Array.isArray(data)) setActivities(data) }).catch(() => {})
     getRecentCalls().then((d: any) => { if (d.calls?.length) setCalls(d.calls) }).catch(() => {})
   }, [])
 

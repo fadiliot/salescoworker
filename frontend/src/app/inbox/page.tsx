@@ -94,7 +94,20 @@ export default function InboxPage() {
       const data = await extractLead(selected.id)
       setExtractedLead(data.extracted ? data.lead : { message: 'No exact lead format detected' })
     } catch {
-      setExtractedLead({ name: selected.from_address.split('@')[0], email: selected.from_address })
+      setExtractedLead({ first_name: selected.from_address.split('@')[0], email: selected.from_address, source: 'email' })
+    }
+    setLoading(false)
+  }
+
+  const handleSaveExtracted = async () => {
+    if (!extractedLead) return; setLoading(true)
+    try {
+      await createLead(extractedLead)
+      alert("Lead saved to CRM successfully!")
+      setExtractedLead(null)
+    } catch (err: any) {
+      const msg = err.response?.data?.detail || "Failed to save lead."
+      alert(msg)
     }
     setLoading(false)
   }
@@ -264,7 +277,7 @@ export default function InboxPage() {
                           </div>
                         ))}
                       </div>
-                      <Button className="w-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/50 hover:bg-emerald-500/30" onClick={() => window.location.href = '/leads'} size="sm">{t('add_to_crm')}</Button>
+                      <Button className="w-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/50 hover:bg-emerald-500/30 font-bold" onClick={handleSaveExtracted} size="sm">{t('add_to_crm')}</Button>
                     </div>
                   )}
 

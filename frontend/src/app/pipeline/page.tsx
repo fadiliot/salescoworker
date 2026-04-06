@@ -39,7 +39,7 @@ const DUMMY_CONTACTS: Record<string, any[]> = {
 
 export default function PipelinePage() {
   const { t } = useLanguage()
-  const [deals, setDeals] = useState(DUMMY_DEALS)
+  const [deals, setDeals] = useState<any[]>([])
 
   const STAGES = [
     { key: 'new', label: t('new'), color: 'border-blue-500', bg: 'bg-blue-500/10', text: 'text-blue-500' },
@@ -58,7 +58,7 @@ export default function PipelinePage() {
 
   useEffect(() => {
     setIsMounted(true)
-    getDeals().then((data: any) => { if (Array.isArray(data) && data.length) setDeals(data) }).catch(() => {})
+    getDeals().then((data: any) => { if (Array.isArray(data)) setDeals(data) }).catch(() => {})
   }, [])
 
   if (!isMounted) return <div className="min-h-screen bg-slate-950" />

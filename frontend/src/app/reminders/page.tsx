@@ -21,7 +21,7 @@ const DUMMY_REMINDERS = [
 
 export default function RemindersPage() {
   const { t } = useLanguage()
-  const [reminders, setReminders] = useState(DUMMY_REMINDERS)
+  const [reminders, setReminders] = useState<any[]>([])
   const [showForm, setShowForm] = useState(false)
   const [tab, setTab] = useState<'active' | 'completed'>('active')
   const [form, setForm] = useState({ title: '', message: '', due_at: '' })
@@ -29,7 +29,7 @@ export default function RemindersPage() {
 
   useEffect(() => {
     setIsMounted(true)
-    getReminders().then((data: any) => { if (Array.isArray(data) && data.length) setReminders(data) }).catch(() => {})
+    getReminders().then((data: any) => { if (Array.isArray(data)) setReminders(data) }).catch(() => {})
   }, [])
 
   if (!isMounted) return <div className="min-h-screen bg-slate-950" />
