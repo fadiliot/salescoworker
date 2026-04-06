@@ -152,7 +152,7 @@ export default function Dashboard() {
         </div>
 
         {/* 2-Column Layout */}
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7 mb-8">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7 mb-12">
           
           {/* Main Hot Leads List (takes 4 columns) */}
           <Card className="col-span-4 bg-slate-900 border-slate-800 flex flex-col">
