@@ -44,28 +44,40 @@ def get_lead(lead_id: UUID, db: Session = Depends(get_db)):
     return lead
 
 
+from sqlalchemy.exc import IntegrityError
+
 @router.post("", response_model=LeadResponse)
 def create_lead(lead_in: LeadCreate, db: Session = Depends(get_db)):
-    lead = Lead(**lead_in.model_dump())
-    db.add(lead)
-    db.commit()
-    db.refresh(lead)
+    try:
+        lead = Lead(**lead_in.model_dump())
+        db.add(lead)
+        db.commit()
+        db.refresh(lead)
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(status_code=400, detail="Lead with this email already exists")
+    
     # Auto-score new lead
-    score_data = score_lead({
-        "name": f"{lead.first_name} {lead.last_name}",
-        "email": lead.email,
-        "company": lead.company,
-        "status": lead.status,
-        "source": str(lead.source),
-        "activities_count": 0,
-        "emails_count": 0,
-        "days_since_contact": 0,
-    })
-    lead.score = score_data.get("score", 0)
-    lead.is_hot = str(score_data.get("is_hot", False)).lower()
-    lead.ai_next_action = score_data.get("next_action")
-    db.commit()
-    db.refresh(lead)
+    try:
+        score_data = score_lead({
+            "name": f"{lead.first_name} {lead.last_name}",
+            "email": lead.email,
+            "company": lead.company,
+            "status": lead.status,
+            "source": str(lead.source),
+            "activities_count": 0,
+            "emails_count": 0,
+            "days_since_contact": 0,
+        })
+        lead.score = score_data.get("score", 0)
+        lead.is_hot = str(score_data.get("is_hot", False)).lower()
+        lead.ai_next_action = score_data.get("next_action")
+        db.commit()
+        db.refresh(lead)
+    except Exception:
+        # If scoring fails, we still have the lead saved from the first commit
+        pass
+        
     return lead
 
 
