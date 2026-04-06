@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import Sidebar from '@/components/Sidebar'
-import { getEmails, suggestReply, sendReply, syncEmails, extractLead, sendEmail } from '@/lib/api'
+import { getEmails, suggestReply, sendReply, syncEmails, extractLead, sendEmail, createLead } from '@/lib/api'
 import { formatDistanceToNow } from 'date-fns'
 import { Mail, Edit3, RefreshCw, Zap, Search, AlertCircle, FileText, CheckCircle2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
