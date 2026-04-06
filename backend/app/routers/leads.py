@@ -33,7 +33,7 @@ def list_leads(
             Lead.email.ilike(f"%{search}%") |
             Lead.company.ilike(f"%{search}%")
         )
-    return query.order_by(Lead.score.desc(), Lead.created_at.desc()).offset(skip).limit(limit).all()
+    return query.order_by(Lead.created_at.desc(), Lead.score.desc()).offset(skip).limit(limit).all()
 
 
 @router.get("/{lead_id}", response_model=LeadResponse)
