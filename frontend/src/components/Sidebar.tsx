@@ -9,6 +9,8 @@ import {
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 
+import { useLanguage } from '@/context/LanguageContext'
+
 const NAV_ITEMS = [
   { href: '/', icon: LayoutDashboard, label: 'Dashboard' },
   { href: '/leads', icon: Target, label: 'Leads', badge: null },
@@ -24,8 +26,8 @@ const BOTTOM_ITEMS = [
 
 export default function Sidebar() {
   const pathname = usePathname()
+  const { lang, setLanguage, dir } = useLanguage()
   const [pbxOnline, setPbxOnline] = useState(true)
-  const [lang, setLang] = useState<'EN' | 'AR'>('EN')
   const [timeStr, setTimeStr] = useState('')
 
   useEffect(() => {
@@ -36,7 +38,10 @@ export default function Sidebar() {
   }, [])
 
   return (
-    <aside className="w-64 border-r border-[#D4AF37]/10 flex flex-col fixed inset-y-0 left-0 overflow-y-auto" style={{ background: 'linear-gradient(180deg, #0F172A 0%, #1E293B 100%)' }}>
+    <aside className={cn(
+      "w-64 border-slate-700/30 flex flex-col fixed inset-y-0 overflow-y-auto z-50",
+      dir === 'rtl' ? "right-0 border-l" : "left-0 border-r"
+    )} style={{ background: 'linear-gradient(180deg, #0F172A 0%, #1E293B 100%)' }}>
       {/* Header & Logo */}
       <div className="px-5 pt-6 pb-4 border-b border-[#D4AF37]/10 shrink-0">
         <div className="flex items-center gap-3">
@@ -66,7 +71,7 @@ export default function Sidebar() {
       <div className="px-5 py-3 shrink-0">
         <div className="inline-flex rounded-lg overflow-hidden border border-[#D4AF37]/20 p-0.5 bg-slate-900/50">
           {(['EN', 'AR'] as const).map(l => (
-            <button key={l} onClick={() => setLang(l)} className={cn(
+            <button key={l} onClick={() => setLanguage(l)} className={cn(
               "px-4 py-1 text-[11px] font-bold tracking-wider rounded-md transition-all",
               lang === l ? "bg-[#D4AF37]/20 text-[#D4AF37] shadow-sm" : "hover:bg-white/5 text-slate-500"
             )}>

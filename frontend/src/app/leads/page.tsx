@@ -80,7 +80,7 @@ export default function LeadsPage() {
   return (
     <div className="flex min-h-screen bg-slate-950 text-slate-50">
       <Sidebar />
-      <main className="flex-1 ml-64 p-8 xl:p-10 flex flex-col h-screen overflow-hidden">
+      <main className="flex-1 ms-64 p-8 xl:p-10 flex flex-col h-screen overflow-hidden">
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 shrink-0 gap-4">
           <div>
             <h1 className="text-3xl font-bold tracking-tight text-white mb-1">Leads</h1>

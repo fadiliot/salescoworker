@@ -104,7 +104,7 @@ export default function InboxPage() {
   return (
     <div className="flex min-h-screen bg-slate-950 text-slate-50">
       <Sidebar />
-      <main className="flex-1 ml-64 flex flex-col h-screen overflow-hidden">
+      <main className="flex-1 ms-64 flex flex-col h-screen overflow-hidden">
         
         <div className="flex flex-1 overflow-hidden h-full">
           {/* Email List Panel */}

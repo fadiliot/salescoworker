@@ -77,7 +77,7 @@ export default function Dashboard() {
   return (
     <div className="flex min-h-screen bg-slate-950 text-slate-50">
       <Sidebar />
-      <main className="flex-1 ml-64 p-8 xl:p-10">
+      <main className="flex-1 ms-64 p-8 xl:p-10">
         
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
@@ -167,13 +167,13 @@ export default function Dashboard() {
                     <div className="w-10 h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center font-bold text-sm text-[#D4AF37]">
                       {lead.name?.charAt(0) || '?'}
                     </div>
-                    <div className="ml-4 space-y-1">
+                    <div className="ms-4 space-y-1">
                       <p className="text-sm font-medium leading-none text-slate-200 group-hover:text-[#D4AF37] transition-colors">
                         {lead.name}
                       </p>
                       <p className="text-xs text-slate-500">{lead.company}</p>
                     </div>
-                    <div className="ml-auto flex items-center gap-3">
+                    <div className="ms-auto flex items-center gap-3">
                       <Badge variant="outline" className={lead.is_hot === 'true' ? 'border-orange-500/50 text-orange-400 bg-orange-500/10' : 'border-slate-700 text-slate-400'}>
                         {lead.status}
                       </Badge>
@@ -219,7 +219,7 @@ export default function Dashboard() {
                   <CardTitle className="text-base font-semibold">Upcoming Meetings</CardTitle>
                   <CardDescription>Click for AI Pre-Meeting Tear Sheets</CardDescription>
                 </div>
-                <Button variant="ghost" size="sm" className="h-8 text-xs text-[#D4AF37] hover:text-[#D4AF37] hover:bg-[#D4AF37]/10">See all <ArrowRight className="w-3 h-3 ml-1" /></Button>
+                <Button variant="ghost" size="sm" className="h-8 text-xs text-[#D4AF37] hover:text-[#D4AF37] hover:bg-[#D4AF37]/10">See all <ArrowRight className="w-3 h-3 ms-1" /></Button>
               </CardHeader>
               <CardContent>
                 <MeetingWidget events={meetings} />
