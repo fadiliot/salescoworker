@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import Sidebar from '@/components/Sidebar'
-import { getAuthStatus, getZohoAuthUrl, getMicrosoftAuthUrl, syncIntegrations } from '@/lib/api'
+import { getAuthStatus, getZohoAuthUrl, getMicrosoftAuthUrl, getGoogleAuthUrl, syncIntegrations } from '@/lib/api'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -12,6 +12,7 @@ import { useLanguage } from '@/context/LanguageContext'
 const INTEGRATIONS = [
   { key: 'zoho_crm', name: 'Zoho CRM', icon: '🔵', desc: 'Sync leads, contacts, and deals bidirectionally', authKey: 'zoho' },
   { key: 'microsoft_outlook', name: 'Microsoft Outlook', icon: '🟦', desc: 'Read emails, send replies via Microsoft Graph API', authKey: 'microsoft' },
+  { key: 'google_meet', name: 'Google Meet', icon: '🟢', desc: 'Fetch meetings and generate briefs from Google Calendar', authKey: 'google' },
   { key: 'yeastar_pbx', name: 'Yeastar PBX', icon: '📞', desc: 'Call logs, CDR, click-to-call (configured server-side)', authKey: null },
 ]
 
@@ -28,12 +29,18 @@ export default function SettingsPage() {
     const params = new URLSearchParams(window.location.search)
     if (params.get('zoho') === 'connected') setFlash('✅ Zoho CRM connected successfully!')
     if (params.get('microsoft') === 'connected') setFlash('✅ Microsoft Outlook connected successfully!')
+    if (params.get('google') === 'connected') setFlash('✅ Google Meet connected successfully!')
   }, [])
 
   const handleConnect = async (authKey: string | null) => {
     if (!authKey) return
     try {
-      const fn = authKey === 'zoho' ? getZohoAuthUrl : getMicrosoftAuthUrl
+      let fn;
+      if (authKey === 'zoho') fn = getZohoAuthUrl
+      else if (authKey === 'microsoft') fn = getMicrosoftAuthUrl
+      else if (authKey === 'google') fn = getGoogleAuthUrl
+      
+      if (!fn) return
       const { auth_url } = await fn()
       window.location.href = auth_url
     } catch {
@@ -128,6 +135,7 @@ export default function SettingsPage() {
                     { label: 'Zoho CRM + Books', vars: ['ZOHO_CLIENT_ID', 'ZOHO_CLIENT_SECRET', 'ZOHO_ORGANIZATION_ID'], link: 'https://api-console.zoho.com/' },
                     { label: 'Microsoft Outlook', vars: ['MS_CLIENT_ID', 'MS_CLIENT_SECRET', 'MS_TENANT_ID'], link: 'https://portal.azure.com' },
                     { label: 'Yeastar PBX', vars: ['YEASTAR_HOST', 'YEASTAR_USERNAME', 'YEASTAR_PASSWORD'], link: null },
+                    { label: 'Google Meet', vars: ['GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET'], link: 'https://console.cloud.google.com/' },
                     { label: 'Google Gemini AI', vars: ['GEMINI_API_KEY'], link: 'https://aistudio.google.com/app/apikey' },
                     { label: 'Database', vars: ['DATABASE_URL'], link: null },
                   ].map(section => (

@@ -38,6 +38,11 @@ class Settings(BaseSettings):
     YEASTAR_USERNAME: Optional[str] = None
     YEASTAR_PASSWORD: Optional[str] = None
 
+    # Google
+    GOOGLE_CLIENT_ID: Optional[str] = None
+    GOOGLE_CLIENT_SECRET: Optional[str] = None
+    GOOGLE_REDIRECT_URI: str = "https://sales-coworker-api.onrender.com/api/auth/callback/google"
+
     # Frontend
     FRONTEND_URL: str = "http://localhost:3000"
 

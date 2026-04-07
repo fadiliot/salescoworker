@@ -7,6 +7,7 @@ from app.database import get_db
 from app.models.activity import Activity
 from app.schemas.activity import ActivityCreate, ActivityResponse
 from app.integrations.yeastar import YeastarClient
+from app.integrations.google_client import GoogleClient
 
 router = APIRouter(prefix="/api/activities", tags=["Activities"])
 
@@ -98,4 +99,14 @@ async def analyze_recent_calls(lead_id: Optional[str] = None, db: Session = Depe
         result = await analyze_call(db, cdr, lead_id=lead_id)
         results.append(result)
     return {"analyzed": len(results), "results": results}
+
+
+@router.get("/meetings/recent")
+async def get_recent_meetings(db: Session = Depends(get_db)):
+    """Fetch upcoming Google Meet meetings from Google Calendar"""
+    google = GoogleClient(db)
+    if not google.is_connected():
+        return {"meetings": [], "message": "Google Meet not connected"}
+    meetings = await google.get_upcoming_meetings(hours_ahead=72)
+    return {"meetings": meetings}
 

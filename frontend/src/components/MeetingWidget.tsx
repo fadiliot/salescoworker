@@ -13,12 +13,12 @@ interface Attendee {
 
 interface MeetingEvent {
   id: string
+  source: 'google' | 'microsoft'
   subject: string
-  start: { dateTime: string }
-  end: { dateTime: string }
-  attendees?: Attendee[]
-  location?: { displayName?: string }
-  bodyPreview?: string
+  start: string
+  end: string
+  attendees?: string[]
+  link?: string
 }
 
 interface MeetingWidgetProps {
@@ -41,10 +41,7 @@ export default function MeetingWidget({ events }: MeetingWidgetProps) {
     setBrief([])
     setLoading(true)
     try {
-      const attendeeEmails = (event.attendees || [])
-        .map((a: Attendee) => a.emailAddress?.address)
-        .filter(Boolean)
-        .join(',')
+      const attendeeEmails = (event.attendees || []).join(',')
       const res = await API.get(`/api/ai/tear-sheet/${event.id}`, { params: { attendee_emails: attendeeEmails } })
       setBrief(res.data.brief || [])
     } catch {
@@ -76,12 +73,13 @@ export default function MeetingWidget({ events }: MeetingWidgetProps) {
             className="group flex items-start justify-between p-3 rounded-xl bg-slate-950/50 border border-slate-800 hover:border-[#D4AF37]/50 hover:bg-slate-900 transition-all cursor-pointer shadow-sm"
           >
             <div className="flex-1 min-w-0 pr-3">
-              <div className="text-[13px] font-bold text-slate-200 group-hover:text-white truncate transition-colors">
+              <div className="text-[13px] font-bold text-slate-200 group-hover:text-white truncate transition-colors flex items-center gap-2">
+                <span className="opacity-70">{ev.source === 'google' ? '🟢' : '🟦'}</span>
                 {ev.subject}
               </div>
               <div className="text-[11px] text-slate-500 mt-1 flex items-center gap-2">
-                <span className="flex items-center gap-1"><CalendarIcon className="w-3 h-3" /> {fmtDate(ev.start.dateTime)}</span>
-                <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {fmt(ev.start.dateTime)} – {fmt(ev.end.dateTime)}</span>
+                <span className="flex items-center gap-1"><CalendarIcon className="w-3 h-3" /> {fmtDate(ev.start)}</span>
+                <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {fmt(ev.start)} – {fmt(ev.end)}</span>
               </div>
             </div>
             
@@ -98,22 +96,22 @@ export default function MeetingWidget({ events }: MeetingWidgetProps) {
              <>
               <div className="p-6 border-b border-slate-800 bg-slate-900/50 relative">
                 <div className="text-[10px] text-[#D4AF37] font-bold tracking-[0.2em] mb-1.5 flex items-center gap-2">
-                  <Zap className="w-3 h-3" fill="currentColor" /> AI PRE-MEETING TEAR SHEET
+                  <Zap className="w-3 h-3" fill="currentColor" /> AI PRE-MEETING TEAR SHEET ({activeMeeting.source.toUpperCase()})
                 </div>
                 <DialogTitle className="text-xl md:text-2xl font-bold text-white mb-2 leading-tight pr-8">
                   {activeMeeting.subject}
                 </DialogTitle>
                 <div className="flex flex-wrap items-center gap-3 text-[12px] text-slate-400 font-medium">
-                  <div className="flex items-center gap-1.5"><CalendarIcon className="w-3.5 h-3.5" /> {fmtDate(activeMeeting.start.dateTime)}</div>
-                  <div className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" /> {fmt(activeMeeting.start.dateTime)} – {fmt(activeMeeting.end.dateTime)}</div>
+                  <div className="flex items-center gap-1.5"><CalendarIcon className="w-3.5 h-3.5" /> {fmtDate(activeMeeting.start)}</div>
+                  <div className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" /> {fmt(activeMeeting.start)} – {fmt(activeMeeting.end)}</div>
                 </div>
 
                 {/* Attendees */}
                 {activeMeeting.attendees && activeMeeting.attendees.length > 0 && (
                   <div className="mt-4 flex flex-wrap gap-2">
-                    {activeMeeting.attendees.slice(0, 5).map((a: Attendee, i: number) => (
+                    {activeMeeting.attendees.slice(0, 5).map((addr: string, i: number) => (
                       <Badge key={i} variant="secondary" className="bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 text-[10px]">
-                        {a.emailAddress?.name || a.emailAddress?.address}
+                        {addr}
                       </Badge>
                     ))}
                   </div>

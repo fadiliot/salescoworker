@@ -9,6 +9,7 @@ from app.models.email import Email
 from app.models.activity import Activity, ActivityType
 from app.models.contact import Contact
 from app.models.deal import Deal
+from app.integrations.google_client import GoogleClient
 import json
 
 router = APIRouter(prefix="/api/ai", tags=["AI"])
@@ -16,13 +17,48 @@ router = APIRouter(prefix="/api/ai", tags=["AI"])
 
 @router.get("/upcoming-meetings")
 async def get_upcoming_meetings(db: Session = Depends(get_db)):
-    """Fetch upcoming Outlook calendar events for the Meetings widget"""
-    client = OutlookClient(db)
+    """Fetch upcoming meetings from both Outlook and Google Meet"""
+    outlook = OutlookClient(db)
+    google = GoogleClient(db)
+    
+    all_events = []
+    
+    # 1. Fetch Outlook
     try:
-        events = await client.get_upcoming_events(hours_ahead=48)
-        return {"events": events}
+        ms_events = await outlook.get_upcoming_events(hours_ahead=48)
+        for ev in ms_events:
+            all_events.append({
+                "id": ev.get("id"),
+                "source": "microsoft",
+                "subject": ev.get("subject", "No Subject"),
+                "start": ev.get("start", {}).get("dateTime"),
+                "end": ev.get("end", {}).get("dateTime"),
+                "attendees": [a.get("emailAddress", {}).get("address") for a in ev.get("attendees", [])],
+                "link": ev.get("location", {}).get("displayName"), # Simplified
+            })
     except Exception:
-        return {"events": []}
+        pass
+
+    # 2. Fetch Google
+    try:
+        g_events = await google.get_upcoming_meetings(hours_ahead=48)
+        for ev in g_events:
+            all_events.append({
+                "id": ev.get("id"),
+                "source": "google",
+                "subject": ev.get("summary", "No Subject"),
+                "start": ev.get("start", {}).get("dateTime"),
+                "end": ev.get("end", {}).get("dateTime"),
+                "attendees": [a.get("email") for a in ev.get("attendees", [])],
+                "link": ev.get("hangoutLink"),
+            })
+    except Exception:
+        pass
+
+    # Sort by start time
+    all_events.sort(key=lambda x: x.get("start") or "")
+    
+    return {"events": all_events}
 
 
 @router.get("/tear-sheet/{event_id}")

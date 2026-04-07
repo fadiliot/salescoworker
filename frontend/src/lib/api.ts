@@ -39,6 +39,7 @@ export const createActivity = (data: any) => API.post('/api/activities', data).t
 export const getRecentCalls = () => API.get('/api/activities/calls/recent').then(r => r.data)
 export const clickToDial = (callerExt: string, calleeNumber: string) =>
   API.post('/api/activities/calls/dial', null, { params: { caller_ext: callerExt, callee_number: calleeNumber } }).then(r => r.data)
+export const getRecentMeetings = () => API.get('/api/activities/meetings/recent').then(r => r.data)
 
 // ─── Reminders ──────────────────────────────────────────────────
 export const getReminders = (params?: Record<string, any>) => API.get('/api/reminders', { params }).then(r => r.data)
@@ -49,6 +50,7 @@ export const completeReminder = (id: string) => API.patch(`/api/reminders/${id}/
 export const getAuthStatus = () => API.get('/api/auth/status').then(r => r.data)
 export const getZohoAuthUrl = () => API.get('/api/auth/zoho').then(r => r.data)
 export const getMicrosoftAuthUrl = () => API.get('/api/auth/microsoft').then(r => r.data)
+export const getGoogleAuthUrl = () => API.get('/api/auth/google').then(r => r.data)
 export const syncIntegrations = () => API.post('/api/integrations/sync').then(r => r.data)
 export const getZohoInvoices = () => API.get('/api/integrations/zoho/invoices').then(r => r.data)
 
