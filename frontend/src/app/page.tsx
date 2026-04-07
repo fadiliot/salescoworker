@@ -221,7 +221,6 @@ export default function Dashboard() {
                   <CardTitle className="text-base font-semibold">{t('upcoming_meetings')}</CardTitle>
                   <CardDescription>AI intelligence briefings</CardDescription>
                 </div>
-                <Button variant="ghost" size="sm" className="h-8 text-xs text-[#D4AF37] hover:text-[#D4AF37] hover:bg-[#D4AF37]/10">See all <ArrowRight className="w-3 h-3 ms-1" /></Button>
               </CardHeader>
               <CardContent>
                 <MeetingWidget events={meetings} />
