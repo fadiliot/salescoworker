@@ -121,16 +121,12 @@ class GoogleClient:
                     "timeMax": time_max,
                     "singleEvents": "true",
                     "orderBy": "startTime",
+                    "conferenceDataVersion": 1,
                 },
             )
             if resp.status_code == 200:
                 events = resp.json().get("items", [])
-                # Filter events with Google Meet links
-                meetings = []
-                for event in events:
-                    if "conferenceData" in event or "hangoutLink" in event:
-                        meetings.append(event)
-                return meetings
+                return events
         return []
 
     def is_connected(self) -> bool:
