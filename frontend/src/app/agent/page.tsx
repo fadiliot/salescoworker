@@ -12,8 +12,6 @@ import {
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { Switch } from '@/components/ui/switch'
 import { 
   Zap, 
   History, 
@@ -27,6 +25,7 @@ import {
   Loader2,
   Send
 } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 export default function AgentPage() {
   const [logs, setLogs] = useState([])
@@ -141,10 +140,20 @@ export default function AgentPage() {
                     <div className="p-2 bg-slate-800 rounded-md">
                       <wf.icon className={`w-5 h-5 ${isEnabled ? 'text-[#D4AF37]' : 'text-slate-500'}`} />
                     </div>
-                    <Switch 
-                      checked={isEnabled} 
-                      onCheckedChange={(checked) => handleToggle(wf.id, checked)}
-                    />
+                    <button 
+                      onClick={() => handleToggle(wf.id, !isEnabled)}
+                      className={cn(
+                        "relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+                        isEnabled ? "bg-[#D4AF37]" : "bg-slate-700"
+                      )}
+                    >
+                      <span
+                        className={cn(
+                          "pointer-events-none block h-4 w-4 rounded-full bg-white shadow-lg ring-0 transition-transform",
+                          isEnabled ? "translate-x-4" : "translate-x-0"
+                        )}
+                      />
+                    </button>
                   </div>
                   <h3 className="font-bold text-slate-200">{wf.name}</h3>
                   <p className="text-xs text-slate-500 mt-1">{wf.desc}</p>
@@ -229,7 +238,7 @@ export default function AgentPage() {
                    <span className="text-[10px] text-slate-600 font-mono uppercase tracking-widest">Agent System Core v1.0</span>
                 </div>
               </CardHeader>
-              <ScrollArea className="flex-1 p-4">
+              <div className="flex-1 p-4 overflow-y-auto custom-scrollbar">
                 <div className="space-y-3">
                   {logs.map((log, i) => (
                     <div key={log.id} className="text-xs flex gap-3 group">
@@ -250,7 +259,7 @@ export default function AgentPage() {
                     <p className="text-slate-600 text-center mt-8 italic">Awaiting autonomous actions...</p>
                   )}
                 </div>
-              </ScrollArea>
+              </div>
             </Card>
           </div>
         </div>
