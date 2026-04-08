@@ -102,7 +102,7 @@ export default function AgentPage() {
   return (
     <div className="flex min-h-screen bg-slate-950 text-slate-50">
       <Sidebar />
-      <main className="flex-1 p-8 overflow-y-auto">
+      <main className="flex-1 ms-64 p-8">
         <header className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold flex items-center gap-3">
