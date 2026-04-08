@@ -52,6 +52,7 @@ export const getZohoAuthUrl = () => API.get('/api/auth/zoho').then(r => r.data)
 export const getMicrosoftAuthUrl = () => API.get('/api/auth/microsoft').then(r => r.data)
 export const getGoogleAuthUrl = () => API.get('/api/auth/google').then(r => r.data)
 export const syncIntegrations = () => API.post('/api/integrations/sync').then(r => r.data)
+export const seedSampleData = () => API.post('/api/integrations/seed').then(r => r.data)
 export const getZohoInvoices = () => API.get('/api/integrations/zoho/invoices').then(r => r.data)
 
 // ─── AI ─────────────────────────────────────────────────────────

@@ -8,6 +8,7 @@ from app.integrations.outlook import OutlookClient
 from app.models.lead import Lead, LeadSource, LeadStatus
 from app.models.deal import Deal, DealStage
 from app.models.contact import Contact
+from app.utils.seeder import seed_database
 from datetime import datetime
 
 router = APIRouter(prefix="/api/integrations", tags=["Integrations"])
@@ -105,3 +106,9 @@ async def get_zoho_customers(db: Session = Depends(get_db)):
         return {"customers": [], "message": "Zoho Books not connected"}
     customers = await client.get_customers()
     return {"customers": customers}
+
+
+@router.post("/seed")
+def seed_app_data(db: Session = Depends(get_db)):
+    """Seed the database with sample data"""
+    return seed_database(db)

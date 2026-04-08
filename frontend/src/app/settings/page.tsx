@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import Sidebar from '@/components/Sidebar'
-import { getAuthStatus, getZohoAuthUrl, getMicrosoftAuthUrl, getGoogleAuthUrl, syncIntegrations } from '@/lib/api'
+import { getAuthStatus, getZohoAuthUrl, getMicrosoftAuthUrl, getGoogleAuthUrl, syncIntegrations, seedSampleData } from '@/lib/api'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -52,6 +52,21 @@ export default function SettingsPage() {
     setSyncing(true)
     try { await syncIntegrations(); setFlash('✅ Sync started — data will update shortly') } catch { setFlash('❌ Sync failed — check backend') }
     setTimeout(() => setFlash(''), 4000)
+    setSyncing(false)
+  }
+
+  const handleSeed = async () => {
+    if (!confirm('This will CLEAR all your current leads, deals, and emails and replace them with sample data. Continue?')) {
+      return
+    }
+    setSyncing(true)
+    try {
+      await seedSampleData()
+      setFlash('✅ Sample data seeded! Redirecting to Dashboard...')
+      setTimeout(() => window.location.href = '/', 2000)
+    } catch {
+      setFlash('❌ Seeding failed — check backend logs')
+    }
     setSyncing(false)
   }
 
@@ -155,6 +170,16 @@ export default function SettingsPage() {
                        </div>
                      </div>
                   ))}
+                </div>
+
+                <div className="mt-8 pt-6 border-t border-slate-800 flex items-center justify-between">
+                  <div className="space-y-1">
+                    <div className="text-sm font-bold text-slate-200">Demo Mode</div>
+                    <div className="text-xs text-slate-500">Wipe current state and populate with realistic sample data</div>
+                  </div>
+                  <Button variant="outline" size="sm" className="border-[#D4AF37]/30 text-[#D4AF37] hover:bg-[#D4AF37]/10" onClick={handleSeed} disabled={syncing}>
+                    <Zap className="w-3.5 h-3.5 mr-2" /> Seed Sample Data
+                  </Button>
                 </div>
               </CardContent>
             </Card>
