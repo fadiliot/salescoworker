@@ -33,6 +33,8 @@ def generate_reply(
     model = _get_model()
 
     if not model:
+        if not settings.AI_FALLBACK_ENABLED:
+            raise RuntimeError("Gemini API Key missing and fallbacks disabled.")
         return (
             f"Hi,\n\nThank you for reaching out regarding '{subject}'. "
             "I'd be happy to discuss this further and explore how we can help you.\n\n"
@@ -62,6 +64,8 @@ Reply:"""
         response = model.generate_content(prompt)
         return response.text.strip()
     except Exception as e:
+        if not settings.AI_FALLBACK_ENABLED:
+            raise RuntimeError(f"Gemini API call failed: {str(e)}")
         return (
             f"Hi,\n\nThank you for your email. I'll get back to you shortly.\n\n"
             f"Best regards,\n{agent_name}"
@@ -78,6 +82,8 @@ def generate_followup(
     model = _get_model()
 
     if not model:
+        if not settings.AI_FALLBACK_ENABLED:
+            raise RuntimeError("Gemini API Key missing and fallbacks disabled.")
         return (
             f"Hi {lead_name},\n\nI wanted to follow up on our previous conversation. "
             "We'd love to help move things forward.\n\n"
@@ -103,7 +109,9 @@ Follow-up email:"""
     try:
         response = model.generate_content(prompt)
         return response.text.strip()
-    except Exception:
+    except Exception as e:
+        if not settings.AI_FALLBACK_ENABLED:
+            raise RuntimeError(f"Gemini API call failed: {str(e)}")
         return (
             f"Hi {lead_name},\n\nJust following up to see if you had a chance to review our last conversation. "
             "Happy to answer any questions!\n\nBest,\n{agent_name}"

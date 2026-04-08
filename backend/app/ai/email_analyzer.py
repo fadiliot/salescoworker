@@ -45,6 +45,8 @@ def analyze_email(
 
     # Dummy response when no API key
     if not model:
+        if not settings.AI_FALLBACK_ENABLED:
+            raise RuntimeError("Gemini API Key missing and fallbacks disabled.")
         return {
             "summary": f"Email from {from_address} about: {subject[:100]}",
             "sentiment": "neutral",
