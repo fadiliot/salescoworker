@@ -26,6 +26,7 @@ export default function Sidebar() {
     { href: '/inbox', icon: Mail, label: t('inbox'), badge: '5', badgeType: '' },
     { href: '/activities', icon: Activity, label: t('activities') },
     { href: '/reminders', icon: Bell, label: t('reminders'), badge: '2', badgeType: 'hot' },
+    { href: '/agent', icon: Bot, label: t('agent') },
   ]
   
   const BOTTOM_ITEMS = [

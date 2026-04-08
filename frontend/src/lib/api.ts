@@ -55,7 +55,15 @@ export const syncIntegrations = () => API.post('/api/integrations/sync').then(r 
 export const seedSampleData = () => API.post('/api/integrations/seed').then(r => r.data)
 export const getZohoInvoices = () => API.get('/api/integrations/zoho/invoices').then(r => r.data)
 
-// ─── AI ─────────────────────────────────────────────────────────
+// ─── Agent ────────────────────────────────────────────────────────
+export const getAgentLogs = () => API.get('/api/agent/logs').then(r => r.data)
+export const getAgentConfig = () => API.get('/api/agent/config').then(r => r.data)
+export const toggleAgentWorkflow = (name: string, enabled: boolean) => API.post(`/api/agent/config/${name}`, null, { params: { enabled } }).then(r => r.data)
+export const getApprovalQueue = () => API.get('/api/agent/approval-queue').then(r => r.data)
+export const approveAgentDraft = (id: string) => API.post(`/api/agent/approval-queue/${id}/approve`).then(r => r.data)
+export const triggerAgentWorkflow = (name: string) => API.post('/api/agent/trigger', null, { params: { workflow_name: name } }).then(r => r.data)
+
+// ─── AI ──────────────────────────────────────────────────────────
 export const getPipelineInsights = () => API.get('/api/ai/pipeline-insights').then(r => r.data)
 export const scoreAllLeads = () => API.post('/api/ai/score-all-leads').then(r => r.data)
 export const generateFollowup = (data: any) => API.post('/api/ai/generate-followup', data).then(r => r.data)

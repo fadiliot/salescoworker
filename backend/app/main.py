@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from app.database import get_db, engine, Base
 from app.models import Lead, Contact, Deal, Email, Activity, IntegrationToken, Reminder, User
-from app.routers import leads, deals, emails, activities, reminders, auth, ai, integrations, contacts
+from app.routers import leads, deals, emails, activities, reminders, auth, ai, integrations, contacts, agent
 from app.config import get_settings
 from datetime import datetime
 
@@ -40,6 +40,7 @@ app.include_router(auth.router)
 app.include_router(ai.router)
 app.include_router(integrations.router)
 app.include_router(contacts.router)
+app.include_router(agent.router)
 
 
 @app.get("/health")

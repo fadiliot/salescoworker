@@ -6,8 +6,10 @@ from app.models.activity import Activity
 from app.models.integration_token import IntegrationToken
 from app.models.reminder import Reminder
 from app.models.user import User
+from app.models.agent import AgentLog, AgentConfig, ApprovalQueue
 
 __all__ = [
     "Lead", "Contact", "Deal", "Email",
-    "Activity", "IntegrationToken", "Reminder", "User"
+    "Activity", "IntegrationToken", "Reminder", "User",
+    "AgentLog", "AgentConfig", "ApprovalQueue"
 ]

@@ -103,13 +103,13 @@ class GoogleClient:
 
         return token.access_token
 
-    async def get_upcoming_meetings(self, hours_ahead: int = 24) -> List[Dict]:
+    async def get_upcoming_meetings(self, hours_ahead: int = 24, hours_back: int = 0) -> List[Dict]:
         access_token = await self._get_valid_token()
         if not access_token:
             return []
 
         now = datetime.now(timezone.utc)
-        time_min = now.isoformat()
+        time_min = (now - timedelta(hours=hours_back)).isoformat()
         time_max = (now + timedelta(hours=hours_ahead)).isoformat()
 
         async with httpx.AsyncClient() as client:
