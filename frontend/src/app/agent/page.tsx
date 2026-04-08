@@ -28,12 +28,12 @@ import {
 import { cn } from '@/lib/utils'
 
 export default function AgentPage() {
-  const [logs, setLogs] = useState([])
-  const [config, setConfig] = useState([])
-  const [queue, setQueue] = useState([])
+  const [logs, setLogs] = useState<any[]>([])
+  const [config, setConfig] = useState<any[]>([])
+  const [queue, setQueue] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
-  const [processingId, setProcessingId] = useState(null)
-  const [triggering, setTriggering] = useState(null)
+  const [processingId, setProcessingId] = useState<string | null>(null)
+  const [triggering, setTriggering] = useState<string | null>(null)
 
   const fetchData = async () => {
     try {
@@ -58,7 +58,7 @@ export default function AgentPage() {
     return () => clearInterval(interval)
   }, [])
 
-  const handleToggle = async (workflowName, enabled) => {
+  const handleToggle = async (workflowName: string, enabled: boolean) => {
     try {
       await toggleAgentWorkflow(workflowName, enabled)
       fetchData()
@@ -67,7 +67,7 @@ export default function AgentPage() {
     }
   }
 
-  const handleApprove = async (id) => {
+  const handleApprove = async (id: string) => {
     setProcessingId(id)
     try {
       await approveAgentDraft(id)
@@ -79,7 +79,7 @@ export default function AgentPage() {
     }
   }
 
-  const handleTrigger = async (name) => {
+  const handleTrigger = async (name: string) => {
     setTriggering(name)
     try {
       await triggerAgentWorkflow(name)
