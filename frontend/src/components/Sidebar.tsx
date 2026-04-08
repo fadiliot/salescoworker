@@ -4,7 +4,7 @@ import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import { 
   Diamond, LayoutDashboard, Target, KanbanSquare, Mail, 
-  Activity, Bell, Settings, PhoneCall, CheckCircle2 
+  Activity, Bell, Settings, PhoneCall, CheckCircle2, Bot 
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
