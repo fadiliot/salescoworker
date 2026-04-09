@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import Sidebar from '@/components/Sidebar'
-import { getActivities, createActivity, getRecentCalls } from '@/lib/api'
+import API, { getActivities, createActivity, getRecentCalls } from '@/lib/api'
 import { format } from 'date-fns'
 import { Phone, Mail, Users, CheckSquare, FileText, Plus, Filter, Smartphone, Calendar } from 'lucide-react'
 import { Button } from '@/components/ui/button'
