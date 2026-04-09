@@ -16,8 +16,6 @@ import { useLanguage } from '@/context/LanguageContext'
 export default function Sidebar() {
   const pathname = usePathname()
   const { lang, setLanguage, dir, t } = useLanguage()
-  const [pbxOnline, setPbxOnline] = useState(true)
-  const [timeStr, setTimeStr] = useState('')
 
   const NAV_ITEMS = [
     { href: '/', icon: LayoutDashboard, label: t('dashboard') },
@@ -32,13 +30,6 @@ export default function Sidebar() {
   const BOTTOM_ITEMS = [
     { href: '/settings', icon: Settings, label: t('settings') },
   ]
-
-  useEffect(() => {
-    const tick = () => setTimeStr(new Date().toLocaleTimeString('en-AE', { hour: '2-digit', minute: '2-digit', hour12: true, timeZone: 'Asia/Dubai' }))
-    tick()
-    const interval = setInterval(tick, 30000)
-    return () => clearInterval(interval)
-  }, [])
 
   return (
     <aside className={cn(
@@ -55,18 +46,6 @@ export default function Sidebar() {
             <span className="text-lg font-black tracking-widest text-[#D4AF37] leading-none uppercase">SalesAI</span>
             <span className="text-[10px] text-[#D4AF37]/50 tracking-[0.1em] mt-1 font-semibold">DUBAI GOLD</span>
           </div>
-        </div>
-
-        {/* Dubai Live Context */}
-        <div className="mt-5 p-3 rounded-xl bg-[#D4AF37]/5 border border-[#D4AF37]/10 flex flex-col gap-1">
-          <div className="text-xs font-semibold text-[#D4AF37]/80 flex items-center gap-2">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#D4AF37] opacity-40"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#D4AF37]"></span>
-            </span>
-            {t('dubai')} — {timeStr}
-          </div>
-          <div className="text-[10px] text-slate-500 font-medium">{t('next')}: {t('maghrib')} ~18:43</div>
         </div>
       </div>
 
@@ -128,30 +107,8 @@ export default function Sidebar() {
         </div>
       </nav>
 
-      {/* PBX & User Profile */}
+      {/* User Profile */}
       <div className="shrink-0 p-4 border-t border-[#D4AF37]/10 space-y-4">
-        {/* PBX Pill */}
-        <button 
-          onClick={() => setPbxOnline(p => !p)} 
-          className={cn(
-            "w-full flex items-center justify-between p-3 rounded-xl border transition-all duration-300",
-            pbxOnline ? "bg-emerald-500/10 border-emerald-500/20" : "bg-red-500/10 border-red-500/20"
-          )}
-        >
-          <div className="flex items-center gap-3">
-            <span className="relative flex h-2.5 w-2.5">
-              {pbxOnline && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>}
-              <span className={cn("relative inline-flex rounded-full h-2.5 w-2.5", pbxOnline ? "bg-emerald-500" : "bg-red-500")}></span>
-            </span>
-            <div className="text-left">
-              <p className={cn("text-xs font-bold", pbxOnline ? "text-emerald-500" : "text-red-500")}>
-                {pbxOnline ? t('pbx_online') : t('pbx_offline')}
-              </p>
-              <p className="text-[10px] text-slate-500 mt-0.5">{t('yeastar_int')}</p>
-            </div>
-          </div>
-          <PhoneCall className={cn("w-4 h-4", pbxOnline ? "text-emerald-500/50" : "text-red-500/50")} />
-        </button>
 
         {/* User Badge */}
         <div className="flex items-center gap-3 px-1">
