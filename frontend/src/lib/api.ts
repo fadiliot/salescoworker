@@ -95,4 +95,11 @@ export const aiPipelineQA = (data: any) => API.post('/api/ai/tools/pipeline-qa',
 // ─── Activities ──────────────────────────────────────────────────
 export const pushActivityToZoho = (activityId: string) => API.post(`/api/activities/${activityId}/push-zoho`).then(r => r.data)
 
+// ─── Zoho Books ──────────────────────────────────────────────────
+export const getBooksInvoices = (customerName?: string) => API.get('/api/books/invoices', { params: customerName ? { customer_name: customerName } : {} }).then(r => r.data)
+export const getBookInvoiceDetail = (id: string) => API.get(`/api/books/invoices/${id}`).then(r => r.data)
+export const sendInvoiceReminder = (id: string) => API.post(`/api/books/invoices/${id}/send-reminder`).then(r => r.data)
+export const getBooksCustomers = () => API.get('/api/books/customers').then(r => r.data)
+export const getBooksSummary = () => API.get('/api/books/summary').then(r => r.data)
+
 export default API

@@ -112,3 +112,16 @@ class ZohoBooksClient:
             IntegrationToken.service.in_(["zoho_crm", "zoho_books"])
         ).first()
         return token is not None
+
+    async def send_payment_reminder(self, invoice_id: str) -> Dict:
+        """Send a payment reminder email for an invoice via Zoho Books"""
+        access_token = await self._get_valid_token()
+        if not access_token:
+            return {"error": "Not connected"}
+        async with httpx.AsyncClient() as client:
+            resp = await client.post(
+                f"{self.settings.ZOHO_BOOKS_API_URL}/invoices/{invoice_id}/paymentreminder",
+                headers={"Authorization": f"Zoho-oauthtoken {access_token}"},
+                params=self._base_params(),
+            )
+            return resp.json()

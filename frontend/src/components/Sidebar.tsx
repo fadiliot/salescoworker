@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { 
   Layers, LayoutDashboard, Target, KanbanSquare, Mail, 
-  Activity, Bell, Settings, Sparkles, CalendarDays, BarChart3, Wrench, Sun, Moon
+  Activity, Bell, Settings, Sparkles, CalendarDays, BarChart3, Wrench, Sun, Moon, BookOpen
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
@@ -27,6 +27,7 @@ export default function Sidebar() {
     { href: '/meetings', icon: CalendarDays, label: 'Meetings' },
     { href: '/reminders', icon: Bell, label: t('reminders'), badge: '2', badgeType: 'hot' },
     { href: '/reports', icon: BarChart3, label: 'Reports' },
+    { href: '/zoho-books', icon: BookOpen, label: 'Zoho Books' },
     { href: '/ai-tools', icon: Wrench, label: 'AI Tools' },
     { href: '/agent', icon: Sparkles, label: t('agent') },
   ]
