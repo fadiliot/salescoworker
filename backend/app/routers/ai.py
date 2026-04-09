@@ -122,7 +122,7 @@ async def get_tear_sheet(event_id: str, attendee_emails: str = "", db: Session =
 
     try:
         genai.configure(api_key=settings.GEMINI_API_KEY or "")
-        model = genai.GenerativeModel("gemini-1.5-flash")
+        model = genai.GenerativeModel(settings.GEMINI_MODEL)
         response = model.generate_content(prompt)
         text = response.text.strip()
         if "```" in text:

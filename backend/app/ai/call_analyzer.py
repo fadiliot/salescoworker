@@ -41,7 +41,7 @@ async def analyze_call(db: Session, cdr: Dict[str, Any], lead_id: Optional[str] 
                 resp = await client.get(recording_url)
                 if resp.status_code == 200:
                     audio_b64 = base64.b64encode(resp.content).decode()
-                    model = genai.GenerativeModel("gemini-1.5-flash")
+                    model = genai.GenerativeModel(settings.GEMINI_MODEL)
                     prompt = (
                         "You are a sales call analyst. Analyze this call recording and return:\n"
                         "1. SUMMARY: 2 sentences max\n"

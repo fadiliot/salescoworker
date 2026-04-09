@@ -60,6 +60,27 @@ def update_contact_role(contact_id: UUID, role: str, db: Session = Depends(get_d
     return {"id": str(contact.id), "role_type": contact.role_type}
 
 
+@router.post("/{contact_id}/analyze")
+async def analyze_contact_role(contact_id: UUID, db: Session = Depends(get_db)):
+    """Use AI to predict the stakeholder role based on title and metadata"""
+    contact = db.query(Contact).filter(Contact.id == contact_id).first()
+    if not contact:
+        raise HTTPException(status_code=404, detail="Contact not found")
+    
+    from app.ai.stakeholder_analyzer import categorize_contact
+    role = await categorize_contact(
+        first_name=contact.first_name,
+        last_name=contact.last_name or "",
+        title=contact.title or "",
+        company=contact.company or "",
+        notes=contact.notes
+    )
+    
+    contact.role_type = role
+    db.commit()
+    return {"id": str(contact.id), "role_type": contact.role_type, "title": contact.title}
+
+
 @router.delete("/{contact_id}")
 def delete_contact(contact_id: UUID, db: Session = Depends(get_db)):
     contact = db.query(Contact).filter(Contact.id == contact_id).first()

@@ -1,8 +1,9 @@
 'use client'
 import { useState } from 'react'
-import { updateContactRole } from '@/lib/api'
-import { User, Shield, Briefcase, Glasses, Scale, Crown, AlertTriangle } from 'lucide-react'
+import { updateContactRole, analyzeContactRole } from '@/lib/api'
+import { User, Shield, Briefcase, Glasses, Scale, Crown, AlertTriangle, Sparkles, Loader2, Users } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
 
 type StakeholderRole = 'Economic Buyer' | 'Champion' | 'Gatekeeper' | 'Evaluator' | 'Legal' | 'Unknown'
 
@@ -34,6 +35,7 @@ const ROLES: StakeholderRole[] = ['Economic Buyer', 'Champion', 'Gatekeeper', 'E
 
 export default function StakeholderMap({ contacts, dealStage, onRoleChange }: StakeholderMapProps) {
   const [localContacts, setLocalContacts] = useState(contacts)
+  const [analyzingId, setAnalyzingId] = useState<string | null>(null)
 
   const hasEconomicBuyer = localContacts.some(c => c.role_type === 'Economic Buyer')
   const showWarning = !hasEconomicBuyer && dealStage === 'negotiation'
@@ -45,6 +47,21 @@ export default function StakeholderMap({ contacts, dealStage, onRoleChange }: St
       await updateContactRole(id, role)
     } catch {
       // silent optimistic update
+    }
+  }
+
+  const handleAnalyze = async (id: string) => {
+    setAnalyzingId(id)
+    try {
+      const result = await analyzeContactRole(id)
+      if (result.role_type) {
+        setLocalContacts(prev => prev.map(c => c.id === id ? { ...c, role_type: result.role_type } : c))
+        onRoleChange?.(id, result.role_type)
+      }
+    } catch (err) {
+      console.error("AI Analysis failed:", err)
+    } finally {
+      setAnalyzingId(null)
     }
   }
 
@@ -90,6 +107,16 @@ export default function StakeholderMap({ contacts, dealStage, onRoleChange }: St
                       {contact.title || contact.email}
                     </div>
                   </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-slate-500 hover:text-purple-400 hover:bg-purple-400/10 shrink-0"
+                    disabled={analyzingId === contact.id}
+                    onClick={() => handleAnalyze(contact.id)}
+                    title="Analyze with AI"
+                  >
+                    {analyzingId === contact.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
+                  </Button>
                 </div>
 
                 <div className="relative">
@@ -111,11 +138,5 @@ export default function StakeholderMap({ contacts, dealStage, onRoleChange }: St
         })}
       </div>
     </div>
-  )
-}
-
-function Users(props: any) {
-  return (
-    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
   )
 }

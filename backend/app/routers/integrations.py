@@ -75,11 +75,49 @@ async def _sync_zoho_deals(db: Session):
     db.commit()
 
 
+async def _sync_zoho_contacts(db: Session):
+    client = ZohoCRMClient(db)
+    if not client.is_connected():
+        return
+    from app.ai.stakeholder_analyzer import categorize_contact
+    zoho_contacts = await client.get_contacts()
+    for zc in zoho_contacts:
+        zoho_id = zc.get("id")
+        if not zoho_id:
+            continue
+        existing = db.query(Contact).filter(Contact.zoho_contact_id == zoho_id).first()
+        
+        first_name = zc.get("First_Name", "")
+        last_name = zc.get("Last_Name", "")
+        title = zc.get("Title", "")
+        email = zc.get("Email")
+        company = zc.get("Account_Name", {}).get("name", "")
+        
+        if existing:
+            existing.updated_at = datetime.utcnow()
+        else:
+            # AI Categorization for new contacts
+            role = await categorize_contact(first_name, last_name, title, company)
+            contact = Contact(
+                first_name=first_name,
+                last_name=last_name,
+                email=email,
+                phone=zc.get("Phone"),
+                company=company,
+                title=title,
+                role_type=role,
+                zoho_contact_id=zoho_id,
+            )
+            db.add(contact)
+    db.commit()
+
+
 def _sync_all_background(db: Session):
     import asyncio
     loop = asyncio.new_event_loop()
     loop.run_until_complete(_sync_zoho_leads(db))
     loop.run_until_complete(_sync_zoho_deals(db))
+    loop.run_until_complete(_sync_zoho_contacts(db))
     loop.close()
 
 
