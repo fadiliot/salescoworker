@@ -64,9 +64,9 @@ export default function ActivitiesPage() {
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 shrink-0">
           <div>
             <h1 className="text-3xl font-bold tracking-tight text-white mb-2">{t('activities')}</h1>
-            <p className="text-sm text-slate-400">{t('uae_overview')}</p>
+            <p className="text-sm text-slate-400">Professional Suite Activity Log</p>
           </div>
-          <Button className="bg-gradient-to-r from-[#D4AF37] to-[#B8963E] text-slate-950 hover:opacity-90 transition-opacity mt-4 md:mt-0" onClick={() => setShowForm(true)}>
+          <Button className="bg-blue-600 text-white hover:bg-blue-500 transition-colors mt-4 md:mt-0" onClick={() => setShowForm(true)}>
             <Plus className="mr-2 h-4 w-4" /> {t('log_activity')}
           </Button>
         </div>
@@ -74,7 +74,7 @@ export default function ActivitiesPage() {
         <div className="flex flex-wrap gap-2 mb-8 shrink-0">
           {['all', 'call', 'email', 'meeting', 'note', 'task'].map(type => (
             <Button key={type} variant="outline" size="sm" onClick={() => setFilter(type)} 
-              className={`capitalize text-xs h-9 ${filter === type ? 'bg-[#D4AF37]/10 border-[#D4AF37]/50 text-[#D4AF37]' : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-800'}`}>
+              className={`capitalize text-xs h-9 ${filter === type ? 'bg-blue-600/10 border-blue-500/50 text-blue-400' : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-800'}`}>
               {type === 'all' ? <Filter className="w-3.5 h-3.5 mr-2" /> : null}
               {type === 'all' ? 'All' : type === 'call' ? t('call') : type === 'meeting' ? t('meeting') : type}
             </Button>
@@ -164,32 +164,32 @@ export default function ActivitiesPage() {
                  <h2 className="text-lg font-bold text-white">{t('log_activity')}</h2>
                </div>
                <CardContent className="p-6 space-y-4">
-                 <div>
-                    <label className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1.5">{t('type')}</label>
-                    <select className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#D4AF37]/50" 
-                            value={form.activity_type} onChange={e => setForm(f => ({ ...f, activity_type: e.target.value }))}>
-                      {['call', 'email', 'meeting', 'note', 'task'].map(type => <option key={type} value={type}>{type === 'call' ? t('call') : type === 'email' ? t('email') : type === 'meeting' ? t('meeting') : type === 'note' ? t('note') : type === 'task' ? t('task') : type.toUpperCase()}</option>)}
-                    </select>
-                 </div>
-                 <div>
-                    <label className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1.5">{t('deal_title')} *</label>
-                    <input className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#D4AF37]/50" 
-                           value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} />
-                 </div>
-                 <div>
-                    <label className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1.5">{t('notes')}</label>
-                    <textarea className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#D4AF37]/50 min-h-[100px]" 
-                           value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} />
-                 </div>
-                 <div>
-                    <label className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1.5">{t('outcome')} (Optional)</label>
-                    <input className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#D4AF37]/50" 
-                           placeholder="..." value={form.outcome} onChange={e => setForm(f => ({ ...f, outcome: e.target.value }))} />
-                 </div>
-                 <div className="flex justify-end gap-3 pt-4 border-t border-slate-800 mt-2">
-                   <Button variant="ghost" onClick={() => setShowForm(false)}>{t('cancel')}</Button>
-                   <Button className="bg-[#D4AF37] text-slate-950 hover:bg-[#D4AF37]/90" onClick={handleCreate} disabled={!form.title}>{t('save_log')}</Button>
-                 </div>
+                  <div>
+                     <label className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1.5">{t('type')}</label>
+                     <select className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500/50" 
+                             value={form.activity_type} onChange={e => setForm(f => ({ ...f, activity_type: e.target.value }))}>
+                       {['call', 'email', 'meeting', 'note', 'task'].map(type => <option key={type} value={type}>{type === 'call' ? t('call') : type === 'email' ? t('email') : type === 'meeting' ? t('meeting') : type === 'note' ? t('note') : type === 'task' ? t('task') : type.toUpperCase()}</option>)}
+                     </select>
+                  </div>
+                  <div>
+                     <label className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1.5">{t('deal_title')} *</label>
+                     <input className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500/50" 
+                            value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} />
+                  </div>
+                  <div>
+                     <label className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1.5">{t('notes')}</label>
+                     <textarea className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500/50 min-h-[100px]" 
+                            value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} />
+                  </div>
+                  <div>
+                     <label className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1.5">{t('outcome')} (Optional)</label>
+                     <input className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500/50" 
+                            placeholder="..." value={form.outcome} onChange={e => setForm(f => ({ ...f, outcome: e.target.value }))} />
+                  </div>
+                  <div className="flex justify-end gap-3 pt-4 border-t border-slate-800 mt-2">
+                    <Button variant="ghost" onClick={() => setShowForm(false)}>{t('cancel')}</Button>
+                    <Button className="bg-blue-600 text-white hover:bg-blue-500" onClick={handleCreate} disabled={!form.title}>{t('save_log')}</Button>
+                  </div>
                </CardContent>
              </Card>
           </div>

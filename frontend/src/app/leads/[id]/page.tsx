@@ -6,7 +6,7 @@ import { getLead, getLeadNextActions, getActivities } from '@/lib/api'
 import { format } from 'date-fns'
 import { 
   User, Building2, Mail, Phone, Globe, Calendar, 
-  Zap, MessageSquare, Bot, ArrowLeft, MoreHorizontal,
+  Zap, MessageSquare, Sparkles, ArrowLeft, MoreHorizontal,
   ChevronRight, PhoneCall
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -55,7 +55,7 @@ export default function LeadDetailPage() {
 
         <div className="flex flex-col lg:flex-row justify-between items-start gap-6 mb-8">
           <div className="flex items-center gap-5">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#D4AF37] to-[#B8963E] flex items-center justify-center font-bold text-2xl text-slate-950 shadow-lg shadow-[#D4AF37]/10">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center font-bold text-2xl text-white shadow-xl">
               {lead.first_name?.charAt(0)}{lead.last_name?.charAt(0)}
             </div>
             <div>
@@ -72,14 +72,14 @@ export default function LeadDetailPage() {
               </div>
             </div>
           </div>
-          <div className="flex gap-3">
+           <div className="flex gap-3">
              <Button variant="outline" className="border-slate-800 bg-slate-900/50 hover:bg-slate-800 text-slate-300">
-               <Bot className="w-4 h-4 mr-2" /> {t('ai_analysis')}
+               <Sparkles className="w-4 h-4 mr-2" /> {t('ai_analysis')}
              </Button>
-             <Button className="bg-[#D4AF37] text-slate-950 hover:bg-[#B8963E]">
+             <Button className="bg-blue-600 text-white hover:bg-blue-500">
                <PhoneCall className="w-4 h-4 mr-2" /> {t('call')}
              </Button>
-          </div>
+           </div>
         </div>
 
         <div className="flex-1 overflow-y-auto custom-scrollbar pr-4 grid grid-cols-1 lg:grid-cols-3 gap-8 pb-10">
@@ -91,22 +91,22 @@ export default function LeadDetailPage() {
                 <CardTitle className="text-sm font-bold uppercase tracking-widest text-slate-500">{t('profile')}</CardTitle>
               </CardHeader>
               <CardContent className="pt-6 space-y-5">
-                <div className="flex items-start gap-3">
-                  <Mail className="w-4 h-4 text-[#D4AF37] mt-0.5" />
+                 <div className="flex items-start gap-3">
+                  <Mail className="w-4 h-4 text-blue-400 mt-0.5" />
                   <div>
                     <p className="text-[10px] text-slate-500 uppercase font-bold">{t('email')}</p>
                     <p className="text-sm text-slate-200">{lead.email}</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <Phone className="w-4 h-4 text-[#D4AF37] mt-0.5" />
+                  <Phone className="w-4 h-4 text-blue-400 mt-0.5" />
                   <div>
                     <p className="text-[10px] text-slate-500 uppercase font-bold">{t('phone')}</p>
                     <p className="text-sm text-slate-200">{lead.phone || 'N/A'}</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <Calendar className="w-4 h-4 text-[#D4AF37] mt-0.5" />
+                  <Calendar className="w-4 h-4 text-blue-400 mt-0.5" />
                   <div>
                     <p className="text-[10px] text-slate-500 uppercase font-bold">{t('due')}</p>
                     <p className="text-sm text-slate-200">Added {format(new Date(lead.created_at), 'MMM d, yyyy')}</p>
@@ -137,17 +137,17 @@ export default function LeadDetailPage() {
           <div className="lg:col-span-2 space-y-6">
             
             <Card className="bg-slate-900 border-slate-800 shadow-xl overflow-hidden relative">
-              <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#D4AF37]" />
+              <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-600" />
               <CardHeader className="pb-4">
                  <CardTitle className="flex items-center gap-2 text-white">
-                   <Bot className="w-5 h-5 text-[#D4AF37]" /> AI Recommended Actions
+                   <Sparkles className="w-5 h-5 text-blue-400" /> AI Recommended Actions
                  </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 {actions.length > 0 ? actions.map((action, i) => (
-                  <div key={i} className="bg-slate-950/50 border border-slate-800 p-4 rounded-xl flex items-center justify-between group hover:border-[#D4AF37]/30 transition-colors">
+                  <div key={i} className="bg-slate-950/50 border border-slate-800 p-4 rounded-xl flex items-center justify-between group hover:border-blue-500/30 transition-colors">
                      <p className="text-sm text-slate-200 leading-relaxed">{action}</p>
-                     <Button size="sm" variant="ghost" className="text-[#D4AF37] opacity-0 group-hover:opacity-100 transition-opacity">
+                     <Button size="sm" variant="ghost" className="text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity">
                        Done
                      </Button>
                   </div>

@@ -70,7 +70,7 @@ export default function MeetingWidget({ events }: MeetingWidgetProps) {
         {events.map(ev => (
           <div key={ev.id}
             onClick={() => handleFetchBrief(ev)}
-            className="group flex items-start justify-between p-3 rounded-xl bg-slate-950/50 border border-slate-800 hover:border-[#D4AF37]/50 hover:bg-slate-900 transition-all cursor-pointer shadow-sm"
+            className="group flex items-start justify-between p-3 rounded-xl bg-slate-950/50 border border-slate-800 hover:border-blue-500/50 hover:bg-slate-900 transition-all cursor-pointer shadow-sm"
           >
             <div className="flex-1 min-w-0 pr-3">
               <div className="text-[13px] font-bold text-slate-200 group-hover:text-white truncate transition-colors flex items-center gap-2">
@@ -83,7 +83,7 @@ export default function MeetingWidget({ events }: MeetingWidgetProps) {
               </div>
             </div>
             
-            <Badge variant="outline" className="shrink-0 bg-[#D4AF37]/10 text-[#D4AF37] border-[#D4AF37]/30 px-2 py-0 h-6 text-[10px] font-bold tracking-wider rounded-md group-hover:bg-[#D4AF37]/20 transition-colors">
+            <Badge variant="outline" className="shrink-0 bg-blue-600/10 text-blue-400 border-blue-500/30 px-2 py-0 h-6 text-[10px] font-bold tracking-wider rounded-md group-hover:bg-blue-600/20 transition-colors">
               <Zap className="w-3 h-3 mr-1" /> Brief
             </Badge>
           </div>
@@ -91,13 +91,13 @@ export default function MeetingWidget({ events }: MeetingWidgetProps) {
       </div>
 
       <Dialog open={!!activeMeeting} onOpenChange={(open) => !open && setActiveMeeting(null)}>
-         <DialogContent className="sm:max-w-[550px] bg-slate-950 border border-[#D4AF37]/30 shadow-[0_24px_80px_rgba(0,0,0,0.5)] p-0 overflow-hidden text-left">
-           {activeMeeting && (
-             <>
-              <div className="p-6 border-b border-slate-800 bg-slate-900/50 relative">
-                <div className="text-[10px] text-[#D4AF37] font-bold tracking-[0.2em] mb-1.5 flex items-center gap-2">
-                  <Zap className="w-3 h-3" fill="currentColor" /> AI PRE-MEETING TEAR SHEET ({activeMeeting.source.toUpperCase()})
-                </div>
+          <DialogContent className="sm:max-w-[550px] bg-slate-950 border border-white/5 shadow-2xl p-0 overflow-hidden text-left">
+            {activeMeeting && (
+              <>
+               <div className="p-6 border-b border-slate-800 bg-slate-900/50 relative">
+                 <div className="text-[10px] text-blue-400 font-bold tracking-[0.2em] mb-1.5 flex items-center gap-2">
+                   <Zap className="w-3 h-3" fill="currentColor" /> AI PRE-MEETING TEAR SHEET ({activeMeeting.source.toUpperCase()})
+                 </div>
                 <DialogTitle className="text-xl md:text-2xl font-bold text-white mb-2 leading-tight pr-8">
                   {activeMeeting.subject}
                 </DialogTitle>
@@ -118,19 +118,19 @@ export default function MeetingWidget({ events }: MeetingWidgetProps) {
                 )}
               </div>
 
-              <div className="p-6 bg-slate-950 max-h-[50vh] overflow-y-auto">
+               <div className="p-6 bg-slate-950 max-h-[50vh] overflow-y-auto">
                 {loading ? (
                    <div className="flex flex-col flex-1 items-center justify-center py-8 text-slate-400">
-                     <Loader2 className="h-8 w-8 animate-spin text-[#D4AF37] mb-4" />
+                     <Loader2 className="h-8 w-8 animate-spin text-blue-500 mb-4" />
                      <p className="text-sm font-medium tracking-wide">Generating executive brief...</p>
                      <p className="text-xs text-slate-500 mt-1">Analyzing recent emails and deals</p>
                    </div>
                 ) : (
-                  <div className="space-y-4">
+                   <div className="space-y-4">
                     {brief.map((bullet, i) => (
                       <div key={i} className="flex gap-4">
-                        <div className="shrink-0 w-6 h-6 rounded-full bg-[#D4AF37]/10 flex items-center justify-center border border-[#D4AF37]/30">
-                          <span className="text-[#D4AF37] font-black text-xs">{i + 1}</span>
+                        <div className="shrink-0 w-6 h-6 rounded-full bg-blue-600/10 flex items-center justify-center border border-blue-500/30">
+                          <span className="text-blue-400 font-black text-xs">{i + 1}</span>
                         </div>
                         <p className="text-[13px] leading-relaxed text-slate-300 pt-0.5">
                           {bullet}

@@ -3,8 +3,8 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import { 
-  Diamond, LayoutDashboard, Target, KanbanSquare, Mail, 
-  Activity, Bell, Settings, PhoneCall, CheckCircle2, Bot 
+  Layers, LayoutDashboard, Target, KanbanSquare, Mail, 
+  Activity, Bell, Settings, PhoneCall, CheckCircle2, Sparkles 
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
@@ -24,7 +24,7 @@ export default function Sidebar() {
     { href: '/inbox', icon: Mail, label: t('inbox'), badge: '5', badgeType: '' },
     { href: '/activities', icon: Activity, label: t('activities') },
     { href: '/reminders', icon: Bell, label: t('reminders'), badge: '2', badgeType: 'hot' },
-    { href: '/agent', icon: Bot, label: t('agent') },
+    { href: '/agent', icon: Sparkles, label: t('agent') },
   ]
   
   const BOTTOM_ITEMS = [
@@ -37,25 +37,25 @@ export default function Sidebar() {
       dir === 'rtl' ? "right-0 border-l" : "left-0 border-r"
     )} style={{ background: 'linear-gradient(180deg, #0F172A 0%, #1E293B 100%)' }}>
       {/* Header & Logo */}
-      <div className="px-5 pt-6 pb-4 border-b border-[#D4AF37]/10 shrink-0">
+      <div className="px-5 pt-6 pb-4 border-b border-white/5 shrink-0">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center text-black font-bold shadow-[0_0_20px_rgba(212,175,55,0.3)] bg-gradient-to-br from-[#D4AF37] to-[#B8963E]">
-            <Diamond className="w-5 h-5" fill="currentColor" />
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-xl bg-gradient-to-br from-blue-600 to-indigo-700">
+            <Layers className="w-5 h-5" fill="currentColor" />
           </div>
           <div className="flex flex-col">
-            <span className="text-lg font-black tracking-widest text-[#D4AF37] leading-none uppercase">SalesAI</span>
-            <span className="text-[10px] text-[#D4AF37]/50 tracking-[0.1em] mt-1 font-semibold">DUBAI GOLD</span>
+            <span className="text-lg font-bold tracking-tight text-white leading-none">SalesHub</span>
+            <span className="text-[10px] text-slate-500 tracking-[0.1em] mt-1 font-medium uppercase">Intelligent Suite</span>
           </div>
         </div>
       </div>
 
       {/* Language Toggle */}
       <div className="px-5 py-3 shrink-0">
-        <div className="inline-flex rounded-lg overflow-hidden border border-[#D4AF37]/20 p-0.5 bg-slate-900/50">
+        <div className="inline-flex rounded-lg overflow-hidden border border-white/5 p-0.5 bg-slate-900/50">
           {(['EN', 'AR'] as const).map(l => (
             <button key={l} onClick={() => setLanguage(l)} className={cn(
               "px-4 py-1 text-[11px] font-bold tracking-wider rounded-md transition-all",
-              lang === l ? "bg-[#D4AF37]/20 text-[#D4AF37] shadow-sm" : "hover:bg-white/5 text-slate-500"
+              lang === l ? "bg-blue-600/20 text-blue-400 shadow-sm" : "hover:bg-white/5 text-slate-500"
             )}>
               {l}
             </button>
@@ -74,13 +74,13 @@ export default function Sidebar() {
               <Link key={item.href} href={item.href} className={cn(
                 "group flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200",
                 isActive 
-                  ? "bg-[#D4AF37]/10 text-[#D4AF37] shadow-[inset_2px_0_0_#D4AF37]" 
+                  ? "bg-blue-600/10 text-blue-400 shadow-[inset_2px_0_0_#2563EB]" 
                   : "text-slate-400 hover:text-white hover:bg-slate-800/50"
               )}>
-                <Icon className={cn("w-4 h-4 transition-colors", isActive ? "text-[#D4AF37]" : "text-slate-500 group-hover:text-slate-300")} />
+                <Icon className={cn("w-4 h-4 transition-colors", isActive ? "text-blue-500" : "text-slate-500 group-hover:text-slate-300")} />
                 {item.label}
                 {item.badge && (
-                  <Badge variant={item.badgeType === 'hot' ? 'destructive' : 'default'} className={cn("ml-auto h-5 px-1.5 text-[10px] font-bold shadow-none", item.badgeType === 'hot' ? 'bg-orange-500 hover:bg-orange-600' : 'bg-[#D4AF37] text-slate-900 hover:bg-[#D4AF37]/90')}>
+                  <Badge variant={item.badgeType === 'hot' ? 'destructive' : 'default'} className={cn("ml-auto h-5 px-1.5 text-[10px] font-bold shadow-none", item.badgeType === 'hot' ? 'bg-orange-500 hover:bg-orange-600' : 'bg-blue-600 text-white hover:bg-blue-500')}>
                     {item.badge}
                   </Badge>
                 )}
@@ -97,9 +97,9 @@ export default function Sidebar() {
             return (
               <Link key={item.href} href={item.href} className={cn(
                 "group flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200",
-                isActive ? "bg-[#D4AF37]/10 text-[#D4AF37] shadow-[inset_2px_0_0_#D4AF37]" : "text-slate-400 hover:text-white hover:bg-slate-800/50"
+                isActive ? "bg-blue-600/10 text-blue-400 shadow-[inset_2px_0_0_#2563EB]" : "text-slate-400 hover:text-white hover:bg-slate-800/50"
               )}>
-                <Icon className={cn("w-4 h-4", isActive ? "text-[#D4AF37]" : "text-slate-500 group-hover:text-slate-300")} />
+                <Icon className={cn("w-4 h-4", isActive ? "text-blue-500" : "text-slate-500 group-hover:text-slate-300")} />
                 {item.label}
               </Link>
             )
@@ -108,17 +108,16 @@ export default function Sidebar() {
       </nav>
 
       {/* User Profile */}
-      <div className="shrink-0 p-4 border-t border-[#D4AF37]/10 space-y-4">
-
+       <div className="shrink-0 p-4 border-t border-white/5 space-y-4">
         {/* User Badge */}
         <div className="flex items-center gap-3 px-1">
-          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#D4AF37] to-[#B8963E] flex items-center justify-center text-slate-900 font-bold text-sm shadow-lg">
+          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white font-bold text-sm shadow-lg">
             F
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-bold text-slate-200 truncate">Fadil Anwar</p>
-            <p className="text-xs text-[#D4AF37] flex items-center gap-1">
-              <CheckCircle2 className="w-3 h-3" /> {t('gold_tier')}
+            <p className="text-xs text-slate-500 flex items-center gap-1">
+               Account Manager
             </p>
           </div>
         </div>

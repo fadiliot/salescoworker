@@ -7,7 +7,7 @@ import { getDashboardStats, getReminders, completeReminder, syncIntegrations, ge
 import { format, formatDistanceToNow } from 'date-fns'
 import { 
   Users, DollarSign, Activity, Mail, CheckCircle2, 
-  Flame, Bell, ArrowRight, ArrowUpRight, Plus, RefreshCw, Presentation
+  Flame, Bell, ArrowRight, ArrowUpRight, Plus, RefreshCw, Sparkles
 } from 'lucide-react'
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -86,15 +86,15 @@ export default function Dashboard() {
           <div>
             <h1 className="text-3xl font-bold tracking-tight text-white mb-1">{t('dashboard')}</h1>
             <p className="text-sm text-slate-400">
-              {format(new Date(), 'EEEE, MMMM d, yyyy')} — {t('uae_overview')}
+              {format(new Date(), 'EEEE, MMMM d, yyyy')} — Professional Suite
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <Button variant="outline" className="border-[#D4AF37]/20 text-[#D4AF37] hover:bg-[#D4AF37]/10 bg-transparent" onClick={handleSync} disabled={syncing}>
+            <Button variant="outline" className="border-blue-500/20 text-blue-400 hover:bg-blue-500/10 bg-transparent" onClick={handleSync} disabled={syncing}>
               <RefreshCw className={`mr-2 h-4 w-4 ${syncing ? 'animate-spin' : ''}`} />
               {syncing ? '...' : t('sync_data')}
             </Button>
-            <Button className="bg-gradient-to-r from-[#D4AF37] to-[#B8963E] text-slate-950 hover:opacity-90 transition-opacity">
+            <Button className="bg-blue-600 text-white hover:bg-blue-500 transition-colors">
               <Plus className="mr-2 h-4 w-4" /> {t('new_lead')}
             </Button>
           </div>
@@ -103,10 +103,10 @@ export default function Dashboard() {
         {/* 4-Card Stats Grid (Shadcn Dashboard Example Style) */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
           <Card className="bg-slate-900 border-slate-800 shadow-sm relative overflow-hidden group">
-            <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-[#D4AF37] to-transparent opacity-50 group-hover:opacity-100 transition-opacity" />
+            <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-blue-600 to-transparent opacity-50 group-hover:opacity-100 transition-opacity" />
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-slate-400">{t('total_pipeline')}</CardTitle>
-              <DollarSign className="h-4 w-4 text-[#D4AF37]" />
+              <DollarSign className="h-4 w-4 text-blue-500" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-white">AED 2.5M</div>
@@ -166,11 +166,11 @@ export default function Dashboard() {
               <div className="space-y-6">
                 {stats.recent_leads.map((lead: any) => (
                   <div key={lead.id} className="flex items-center group cursor-pointer" onClick={() => window.location.href = `/leads/${lead.id}`}>
-                    <div className="w-10 h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center font-bold text-sm text-[#D4AF37]">
+                    <div className="w-10 h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center font-bold text-sm text-blue-400">
                       {lead.name?.charAt(0) || '?'}
                     </div>
                     <div className="ms-4 space-y-1">
-                      <p className="text-sm font-medium leading-none text-slate-200 group-hover:text-[#D4AF37] transition-colors">
+                      <p className="text-sm font-medium leading-none text-slate-200 group-hover:text-blue-400 transition-colors">
                         {lead.name}
                       </p>
                       <p className="text-xs text-slate-500">{lead.company}</p>
@@ -193,20 +193,20 @@ export default function Dashboard() {
           <div className="col-span-3 space-y-6">
             
             {/* AI Insights Card */}
-            <Card className="bg-gradient-to-br from-slate-900 to-slate-950 border-[#D4AF37]/20 shadow-[0_0_30px_rgba(212,175,55,0.05)]">
+            <Card className="bg-gradient-to-br from-slate-900 to-slate-950 border-white/5 shadow-2xl">
               <CardHeader className="pb-3">
-                <CardTitle className="flex items-center justify-between text-[#D4AF37]">
-                  <span className="flex items-center gap-2 text-sm font-semibold tracking-wide uppercase"><Presentation className="w-4 h-4" /> {t('ai_analysis')}</span>
+                <CardTitle className="flex items-center justify-between text-blue-400 border-b border-white/5 pb-4 mb-2">
+                  <span className="flex items-center gap-2 text-sm font-bold tracking-widest uppercase"><Sparkles className="w-4 h-4" /> {t('ai_analysis')}</span>
                   <span className="text-2xl font-black">{insights.health_score}</span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="w-full h-1.5 bg-slate-800 rounded-full mb-4 overflow-hidden">
-                  <div className="h-full bg-gradient-to-r from-[#D4AF37] to-emerald-500 rounded-full" style={{ width: `${insights.health_score}%` }}></div>
+                  <div className="h-full bg-slate-700 rounded-full" style={{ width: `${insights.health_score}%` }}></div>
                 </div>
                 <ul className="space-y-3">
                   {insights.insights.map((ins: any, i: number) => (
-                    <li key={i} className="text-xs text-slate-300 leading-relaxed border-l-2 border-[#D4AF37]/30 pl-3 py-0.5">
+                    <li key={i} className="text-xs text-slate-300 leading-relaxed border-l-2 border-blue-500/30 pl-3 py-0.5">
                       {ins}
                     </li>
                   ))}
@@ -282,8 +282,8 @@ export default function Dashboard() {
                         {email.subject}
                       </p>
                       <p className="text-[11px] text-slate-500 truncate mt-0.5">{email.from}</p>
-                      <p className="text-[11px] text-[#D4AF37]/80 mt-1.5 flex items-center gap-1.5 line-clamp-1">
-                        <span className="flex w-3 h-3 rotate-180 items-center justify-center bg-[#D4AF37]/20 rounded text-[8px]">💡</span> 
+                      <p className="text-[11px] text-blue-400 mt-1.5 flex items-center gap-1.5 line-clamp-1">
+                        <span className="flex w-3 h-3 items-center justify-center bg-blue-500/20 rounded text-[8px] border border-blue-500/20">💡</span> 
                         {email.summary}
                       </p>
                     </div>

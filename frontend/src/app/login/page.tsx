@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { ArrowRight, Mail, Lock, Bot } from 'lucide-react'
+import { ArrowRight, Mail, Lock, Layers } from 'lucide-react'
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false)
@@ -20,22 +20,22 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-slate-950 flex flex-col md:flex-row relative">
       {/* Background Orbs */}
-      <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-indigo-600/10 blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-[#D4AF37]/10 blur-[120px] pointer-events-none" />
+      <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-blue-600/10 blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-indigo-600/10 blur-[120px] pointer-events-none" />
 
       {/* Auth Panel */}
       <div className="flex-1 flex flex-col items-center justify-center p-6 lg:p-12 z-10 relative">
         <div className="w-full max-w-md">
           <div className="flex flex-col items-center gap-3 text-white mb-2 jsutify-center">
-             <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#D4AF37] to-[#B8963E] flex items-center justify-center shadow-[0_0_30px_rgba(212,175,55,0.4)] text-slate-950 mb-4">
-               <Bot className="w-7 h-7" />
+             <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center shadow-2xl text-white mb-4">
+               <Layers className="w-7 h-7" fill="currentColor" />
              </div>
-             <span className="text-2xl font-bold tracking-tight">Sales Co-worker</span>
-             <p className="text-sm text-slate-400 mt-1 mb-8">Sign in to your intelligent workspace.</p>
+             <span className="text-2xl font-bold tracking-tight">SalesHub</span>
+             <p className="text-sm text-slate-400 mt-1 mb-8 text-center px-4">Your Intelligent Sales Command Center.</p>
           </div>
 
           <Card className="bg-slate-900 border-slate-800 shadow-2xl relative overflow-hidden backdrop-blur-xl">
-            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#F3E5AB] via-[#D4AF37] to-[#B8963E]" />
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-600 to-indigo-700" />
             <CardContent className="p-8">
               <form onSubmit={handleSubmit} className="space-y-5">
                 <div className="space-y-1.5">
@@ -44,24 +44,24 @@ export default function LoginPage() {
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
                     <input required type="email" placeholder="john@company.com" 
                       value={form.email} onChange={e => setForm({...form, email: e.target.value})}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-lg pl-10 pr-4 py-3 text-sm text-white focus:outline-none focus:border-[#D4AF37]/50 focus:ring-1 focus:ring-[#D4AF37]/50 transition-all placeholder:text-slate-600" />
+                      className="w-full bg-slate-950 border border-slate-800 rounded-lg pl-10 pr-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 transition-all placeholder:text-slate-600" />
                   </div>
                 </div>
                 
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between pl-1">
                     <label className="text-xs font-semibold text-slate-400 uppercase tracking-widest">Password</label>
-                    <a href="#" className="text-xs text-[#D4AF37] font-medium hover:underline">Forgot?</a>
+                    <a href="#" className="text-xs text-blue-400 font-medium hover:underline">Forgot?</a>
                   </div>
                   <div className="relative">
                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
                     <input required type="password" placeholder="••••••••" 
                       value={form.password} onChange={e => setForm({...form, password: e.target.value})}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-lg pl-10 pr-4 py-3 text-sm text-white focus:outline-none focus:border-[#D4AF37]/50 focus:ring-1 focus:ring-[#D4AF37]/50 transition-all placeholder:text-slate-600" />
+                      className="w-full bg-slate-950 border border-slate-800 rounded-lg pl-10 pr-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 transition-all placeholder:text-slate-600" />
                   </div>
                 </div>
 
-                <Button type="submit" disabled={loading} className="w-full mt-4 bg-gradient-to-r from-[#D4AF37] to-[#B8963E] text-slate-950 hover:opacity-90 font-bold py-6 mt-8 shadow-[0_0_20px_rgba(212,175,55,0.2)]">
+                <Button type="submit" disabled={loading} className="w-full mt-4 bg-blue-600 text-white hover:bg-blue-500 font-bold py-6 mt-8 shadow-xl transition-colors">
                   {loading ? 'Authenticating...' : <span className="flex items-center gap-2">Sign In <ArrowRight className="w-4 h-4" /></span>}
                 </Button>
                 
@@ -76,7 +76,7 @@ export default function LoginPage() {
           </Card>
 
           <p className="text-center text-sm text-slate-400 mt-8">
-            Don't have an account? <a href="/signup" className="text-white hover:text-[#D4AF37] font-semibold transition-colors">Sign up here</a>
+            Don't have an account? <a href="/signup" className="text-white hover:text-blue-400 font-semibold transition-colors">Sign up here</a>
           </p>
         </div>
       </div>
