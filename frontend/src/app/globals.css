@@ -112,72 +112,120 @@
   scrollbar-color: rgba(37, 99, 235, 0.2) transparent;
 }
 
-/* ═══════════════════════════════════════════════════
-   GLOBAL LIGHT MODE OVERRIDES
-   Remaps hardcoded slate dark utility classes so that
-   every page responds to the light theme toggle.
-═══════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════
+   PROFESSIONAL TECH LIGHT MODE
+   Clean, high-contrast light theme. White cards on #F0F4F8 base.
+   Blue accent stays. Proper typography contrast.
+═══════════════════════════════════════════════════════════════ */
 
-/* Page/main backgrounds */
-.light .bg-slate-950 { background-color: #F1F5F9 !important; }
-.light .bg-slate-900 { background-color: #F8FAFC !important; }
-.light .bg-slate-800 { background-color: #E2E8F0 !important; }
-.light .bg-slate-700 { background-color: #CBD5E1 !important; }
+/* ── Base page background ─────────────────────────────────────── */
+html.light                        { color-scheme: light; }
+.light body                       { background-color: #F0F4F8 !important; color: #0F172A !important; }
 
-/* Partial opacity backgrounds */
-.light .bg-slate-950\/50 { background-color: rgba(241,245,249,0.5) !important; }
-.light .bg-slate-900\/50 { background-color: rgba(248,250,252,0.5) !important; }
-.light .bg-slate-900\/80 { background-color: rgba(248,250,252,0.8) !important; }
-.light .bg-slate-800\/30 { background-color: rgba(226,232,240,0.3) !important; }
-.light .bg-slate-800\/50 { background-color: rgba(226,232,240,0.5) !important; }
-.light .bg-slate-800\/20 { background-color: rgba(226,232,240,0.2) !important; }
+/* ── Main layout backgrounds ──────────────────────────────────── */
+.light .bg-slate-950              { background-color: #F0F4F8 !important; }
+.light .bg-slate-900              { background-color: #FFFFFF !important; box-shadow: 0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04) !important; }
+.light .bg-slate-800              { background-color: #EEF2F7 !important; }
+.light .bg-slate-700              { background-color: #E2E8F0 !important; }
 
-/* Text colors */
-.light .text-slate-50  { color: #0F172A !important; }
-.light .text-slate-100 { color: #1E293B !important; }
-.light .text-slate-200 { color: #1E293B !important; }
-.light .text-slate-300 { color: #334155 !important; }
-.light .text-slate-400 { color: #475569 !important; }
-.light .text-slate-500 { color: #64748B !important; }
-.light .text-slate-600 { color: #64748B !important; }
-.light .text-white     { color: #0F172A !important; }
+/* ── Opacity/transparency variants ───────────────────────────── */
+.light .bg-slate-900\/80          { background-color: rgba(255,255,255,0.95) !important; }
+.light .bg-slate-900\/50          { background-color: rgba(255,255,255,0.7)  !important; }
+.light .bg-slate-800\/50          { background-color: rgba(238,242,247,0.7)  !important; }
+.light .bg-slate-800\/30          { background-color: rgba(238,242,247,0.5)  !important; }
+.light .bg-slate-800\/20          { background-color: rgba(238,242,247,0.4)  !important; }
+.light .bg-slate-950\/50          { background-color: rgba(240,244,248,0.6)  !important; }
 
-/* Borders */
-.light .border-slate-800    { border-color: #CBD5E1 !important; }
-.light .border-slate-700    { border-color: #94A3B8 !important; }
-.light .border-slate-800\/50 { border-color: rgba(203,213,225,0.5) !important; }
-.light .border-slate-800\/80 { border-color: rgba(203,213,225,0.8) !important; }
-.light .border-white\/5     { border-color: rgba(0,0,0,0.08) !important; }
+/* ── Text colors — high contrast ─────────────────────────────── */
+.light .text-white                { color: #0F172A !important; }
+.light .text-slate-50             { color: #0F172A !important; }
+.light .text-slate-100            { color: #0F172A !important; }
+.light .text-slate-200            { color: #1E293B !important; }
+.light .text-slate-300            { color: #334155 !important; }
+.light .text-slate-400            { color: #4B5563 !important; }
+.light .text-slate-500            { color: #6B7280 !important; }
+.light .text-slate-600            { color: #64748B !important; }
 
-/* Inputs and form elements */
-.light input,
+/* ── Borders ──────────────────────────────────────────────────── */
+.light .border-slate-800          { border-color: #E2E8F0 !important; }
+.light .border-slate-700          { border-color: #CBD5E1 !important; }
+.light .border-slate-800\/50      { border-color: rgba(226,232,240,0.8) !important; }
+.light .border-slate-800\/80      { border-color: #E2E8F0 !important; }
+.light .border-white\/5           { border-color: #E2E8F0 !important; }
+.light .border-white\/10          { border-color: #E2E8F0 !important; }
+
+/* ── Cards (shadcn Card component) ───────────────────────────── */
+.light [class~="Card"],
+.light [data-radix-popper-content-wrapper],
+.light .rounded-xl.border,
+.light .rounded-lg.border         { background-color: #FFFFFF !important; border-color: #E2E8F0 !important; }
+
+/* ── Inputs, textareas, selects ──────────────────────────────── */
+.light input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
 .light textarea,
 .light select {
-  background-color: #F1F5F9 !important;
-  border-color: #CBD5E1 !important;
-  color: #0F172A !important;
+  background-color: #F8FAFC !important;
+  border-color:     #CBD5E1 !important;
+  color:            #0F172A !important;
 }
 .light input::placeholder,
-.light textarea::placeholder { color: #94A3B8 !important; }
+.light textarea::placeholder      { color: #94A3B8 !important; }
+.light input:focus,
+.light textarea:focus,
+.light select:focus               { border-color: #2563EB !important; box-shadow: 0 0 0 3px rgba(37,99,235,0.12) !important; }
 
-/* Cards */
-.light [class*="bg-slate-9"] {
-  background-color: #FFFFFF !important;
+/* ── Table rows ──────────────────────────────────────────────── */
+.light tr:hover td                { background-color: #F0F4F8 !important; }
+.light thead tr                   { border-bottom-color: #E2E8F0 !important; }
+.light tbody tr                   { border-bottom-color: #F1F5F9 !important; }
+
+/* ── Hover states ────────────────────────────────────────────── */
+.light .hover\:bg-slate-800\/50:hover  { background-color: #EEF2F7 !important; }
+.light .hover\:bg-slate-800\/30:hover  { background-color: #F1F5F9 !important; }
+.light .hover\:bg-slate-800:hover      { background-color: #E2E8F0 !important; }
+.light .hover\:border-slate-700:hover  { border-color:     #94A3B8 !important; }
+
+/* ── Sidebar ─────────────────────────────────────────────────── */
+.light nav,
+.light aside {
+  background: #FFFFFF !important;
+  border-right: 1px solid #E2E8F0 !important;
+  box-shadow: 2px 0 8px rgba(0,0,0,0.04) !important;
 }
+/* Active sidebar nav item */
+.light .bg-blue-600\/10           { background-color: #EFF6FF !important; }
+.light .text-blue-400             { color: #2563EB !important; }
+.light .text-blue-300             { color: #1D4ED8 !important; }
 
-/* Hover states */
-.light .hover\:bg-slate-800\/50:hover { background-color: rgba(226,232,240,0.6) !important; }
-.light .hover\:bg-slate-800\/30:hover { background-color: rgba(226,232,240,0.4) !important; }
-.light .hover\:border-slate-700:hover { border-color: #94A3B8 !important; }
+/* ── Blue accent items (keep them blue, just adjust shade) ────── */
+.light .bg-blue-600               { background-color: #2563EB !important; }
+.light .bg-blue-600\/20           { background-color: #DBEAFE !important; }
+.light .bg-blue-500\/10           { background-color: #EFF6FF !important; }
+.light .bg-blue-600\/10           { background-color: #EFF6FF !important; }
+.light .border-blue-500\/30       { border-color: #BFDBFE !important; }
+.light .border-blue-500\/20       { border-color: #BFDBFE !important; }
 
-/* Gradient sidebar override */
-.light aside[style] {
-  background: linear-gradient(180deg, #F8FAFC 0%, #F1F5F9 100%) !important;
-}
+/* ── Status / badge colors — keep saturated ──────────────────── */
+.light .bg-emerald-500\/10        { background-color: #ECFDF5 !important; }
+.light .border-emerald-500\/30    { border-color: #A7F3D0 !important; }
+.light .bg-red-500\/10            { background-color: #FEF2F2 !important; }
+.light .border-red-500\/30        { border-color: #FECACA !important; }
+.light .bg-orange-500\/10         { background-color: #FFF7ED !important; }
+.light .border-orange-500\/30     { border-color: #FED7AA !important; }
+.light .bg-purple-500\/10         { background-color: #F5F3FF !important; }
+.light .border-purple-500\/30     { border-color: #DDD6FE !important; }
 
-/* Code blocks */
-.light code { background-color: #E2E8F0 !important; color: #1E293B !important; }
+/* ── Scrollbar ───────────────────────────────────────────────── */
+.light ::-webkit-scrollbar-track  { background: #F1F5F9; }
+.light ::-webkit-scrollbar-thumb  { background: #CBD5E1; border-radius: 10px; }
+.light ::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
+.light *                           { scrollbar-color: #CBD5E1 #F1F5F9; }
 
-/* Scrollbar in light mode */
-.light ::-webkit-scrollbar-thumb { background: rgba(37, 99, 235, 0.15); }
-.light * { scrollbar-color: rgba(37, 99, 235, 0.15) transparent; }
+/* ── Misc ─────────────────────────────────────────────────────── */
+.light code                        { background-color: #EEF2F7 !important; color: #1E293B !important; }
+.light .bg-black\/70               { background-color: rgba(15,23,42,0.5) !important; }
+.light .bg-black\/60               { background-color: rgba(15,23,42,0.4) !important; }
+
+/* ── Gradient-based backgrounds used in some cards ───────────── */
+.light .from-blue-900\/30          { --tw-gradient-from: rgba(219,234,254,0.6) !important; }
+.light .to-indigo-900\/20          { --tw-gradient-to:   rgba(224,231,255,0.4) !important; }
