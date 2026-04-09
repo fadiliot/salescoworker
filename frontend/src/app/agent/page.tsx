@@ -18,7 +18,7 @@ import {
   CheckCircle2, 
   XCircle, 
   Play, 
-  Bot, 
+  Sparkles, 
   Calendar, 
   Mail, 
   AlertCircle,
@@ -94,7 +94,7 @@ export default function AgentPage() {
   if (loading && config.length === 0) {
     return (
       <div className="flex min-h-screen bg-slate-950 items-center justify-center">
-        <Loader2 className="w-8 h-8 text-[#D4AF37] animate-spin" />
+        <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
       </div>
     )
   }
@@ -106,8 +106,8 @@ export default function AgentPage() {
         <header className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold flex items-center gap-3">
-              <div className="p-2 bg-[#D4AF37]/20 rounded-lg">
-                <Bot className="w-8 h-8 text-[#D4AF37]" />
+              <div className="p-2 bg-blue-600/20 rounded-lg">
+                <Sparkles className="w-8 h-8 text-blue-400" />
               </div>
               Agent Control Center
             </h1>
@@ -117,7 +117,7 @@ export default function AgentPage() {
             <Button variant="outline" className="border-slate-800" onClick={fetchData}>
               <History className="w-4 h-4 mr-2" /> Refresh
             </Button>
-            <Button className="bg-[#D4AF37] hover:bg-[#B8963E] text-slate-950 font-bold" onClick={() => window.location.reload()}>
+            <Button className="bg-blue-600 text-white hover:bg-blue-500 font-bold" onClick={() => window.location.reload()}>
               <Zap className="w-4 h-4 mr-2" /> Live Status: Active
             </Button>
           </div>
@@ -138,13 +138,13 @@ export default function AgentPage() {
                 <CardContent className="p-5">
                   <div className="flex justify-between items-start mb-4">
                     <div className="p-2 bg-slate-800 rounded-md">
-                      <wf.icon className={`w-5 h-5 ${isEnabled ? 'text-[#D4AF37]' : 'text-slate-500'}`} />
+                      <wf.icon className={`w-5 h-5 ${isEnabled ? 'text-blue-400' : 'text-slate-500'}`} />
                     </div>
                     <button 
                       onClick={() => handleToggle(wf.id, !isEnabled)}
                       className={cn(
                         "relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
-                        isEnabled ? "bg-[#D4AF37]" : "bg-slate-700"
+                        isEnabled ? "bg-blue-600" : "bg-slate-700"
                       )}
                     >
                       <span
@@ -160,7 +160,7 @@ export default function AgentPage() {
                   <Button 
                     variant="ghost" 
                     size="sm" 
-                    className="w-full mt-4 text-[#D4AF37] hover:bg-[#D4AF37]/10"
+                    className="w-full mt-4 text-blue-400 hover:bg-blue-400/10"
                     disabled={!isEnabled || isTriggering}
                     onClick={() => handleTrigger(wf.id)}
                   >

@@ -5,7 +5,7 @@ import { getLeads, createLead, deleteLead, rescoreLead, scoreAllLeads } from '@/
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Search, Plus, Filter, Bot, Mail, Trash2, Zap } from 'lucide-react'
+import { Search, Plus, Filter, Sparkles, Mail, Trash2, Zap } from 'lucide-react'
 
 import { useLanguage } from '@/context/LanguageContext'
 
@@ -92,9 +92,9 @@ export default function LeadsPage() {
           </div>
           <div className="flex gap-3">
             <Button variant="outline" className="border-slate-800 bg-slate-900 text-slate-300 hover:text-white hover:bg-slate-800" onClick={handleScoreAll} disabled={scoring}>
-              <Bot className="w-4 h-4 mr-2 text-indigo-400" /> {scoring ? '...' : t('ai_score_all')}
+              <Sparkles className="w-4 h-4 mr-2 text-blue-400" /> {scoring ? '...' : t('ai_score_all')}
             </Button>
-            <Button className="bg-gradient-to-r from-[#D4AF37] to-[#B8963E] text-slate-950 hover:opacity-90 transition-opacity" onClick={() => setShowForm(true)}>
+            <Button className="bg-blue-600 text-white hover:bg-blue-500 transition-colors" onClick={() => setShowForm(true)}>
               <Plus className="mr-2 h-4 w-4" /> {t('new_lead')}
             </Button>
           </div>
@@ -105,7 +105,7 @@ export default function LeadsPage() {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
             <input 
-              className="w-full xl:w-80 bg-slate-900 border border-slate-800 rounded-lg pl-10 pr-4 py-2 text-sm text-slate-200 focus:outline-none focus:border-[#D4AF37]/50 focus:ring-1 focus:ring-[#D4AF37]/50 transition-all placeholder:text-slate-600"
+              className="w-full xl:w-80 bg-slate-900 border border-slate-800 rounded-lg pl-10 pr-4 py-2 text-sm text-slate-200 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 transition-all placeholder:text-slate-600"
               placeholder="Search leads, companies..." 
               value={search} onChange={e => setSearch(e.target.value)} 
             />
@@ -114,7 +114,7 @@ export default function LeadsPage() {
             {STATUSES.map(s => (
               <Button key={s} variant="outline" size="sm" 
                 onClick={() => setStatusFilter(s)}
-                className={`text-xs capitalize h-9 ${statusFilter === s ? 'bg-[#D4AF37]/10 border-[#D4AF37]/50 text-[#D4AF37]' : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-800'}`}>
+                className={`text-xs capitalize h-9 ${statusFilter === s ? 'bg-blue-600/10 border-blue-500/50 text-blue-400' : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-800'}`}>
                 {s}
               </Button>
             ))}
@@ -141,7 +141,7 @@ export default function LeadsPage() {
                   <tr key={lead.id} className="hover:bg-slate-800/20 transition-colors group">
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-slate-800 flex items-center justify-center font-bold text-sm text-[#D4AF37] shrink-0 border border-slate-700">
+                        <div className="w-9 h-9 rounded-full bg-slate-800 flex items-center justify-center font-bold text-sm text-blue-400 shrink-0 border border-slate-700">
                           {lead.first_name?.charAt(0) || '?'}
                         </div>
                         <div>
@@ -165,8 +165,8 @@ export default function LeadsPage() {
                     <td className="py-3 px-4"><ScoreBadge score={lead.score} /></td>
                     <td className="py-3 px-4 text-right">
                       <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-indigo-400 hover:bg-slate-800" title="Rescore" onClick={() => rescoreLead(lead.id).catch(() => {})}>
-                          <Bot className="w-4 h-4" />
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-400 hover:bg-slate-800" title="Rescore" onClick={() => rescoreLead(lead.id).catch(() => {})}>
+                          <Sparkles className="w-4 h-4" />
                         </Button>
                         <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-white hover:bg-slate-800" title="Email" onClick={() => window.location.href = '/inbox'}>
                           <Mail className="w-4 h-4" />
@@ -256,7 +256,7 @@ export default function LeadsPage() {
 
                 <div className="flex justify-end gap-3 pt-4 border-t border-slate-800 mt-6">
                   <Button variant="ghost" onClick={() => setShowForm(false)}>Cancel</Button>
-                  <Button className="bg-[#D4AF37] text-slate-950 hover:bg-[#D4AF37]/90" onClick={handleCreate} disabled={!form.first_name}>{t('new_lead')}</Button>
+                  <Button className="bg-blue-600 text-white hover:bg-blue-500" onClick={handleCreate} disabled={!form.first_name}>{t('new_lead')}</Button>
                 </div>
               </CardContent>
             </Card>
