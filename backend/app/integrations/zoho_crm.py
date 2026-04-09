@@ -178,3 +178,100 @@ class ZohoCRMClient:
             IntegrationToken.service == "zoho_crm"
         ).first()
         return token is not None and token.access_token != ""
+
+    async def create_event(self, event_data: Dict) -> Dict:
+        """Create an Event/Meeting in Zoho CRM"""
+        access_token = await self._get_valid_token()
+        if not access_token:
+            return {"error": "Zoho CRM not connected"}
+        async with httpx.AsyncClient() as client:
+            resp = await client.post(
+                f"{self.settings.ZOHO_CRM_API_URL}/Events",
+                headers={"Authorization": f"Zoho-oauthtoken {access_token}", "Content-Type": "application/json"},
+                json={"data": [event_data]},
+            )
+            data = resp.json()
+            return data.get("data", [{}])[0] if resp.status_code in (200, 201) else {"error": data}
+
+    async def create_task(self, task_data: Dict) -> Dict:
+        """Create a Task in Zoho CRM"""
+        access_token = await self._get_valid_token()
+        if not access_token:
+            return {"error": "Zoho CRM not connected"}
+        async with httpx.AsyncClient() as client:
+            resp = await client.post(
+                f"{self.settings.ZOHO_CRM_API_URL}/Tasks",
+                headers={"Authorization": f"Zoho-oauthtoken {access_token}", "Content-Type": "application/json"},
+                json={"data": [task_data]},
+            )
+            data = resp.json()
+            return data.get("data", [{}])[0] if resp.status_code in (200, 201) else {"error": data}
+
+    async def create_call(self, call_data: Dict) -> Dict:
+        """Create a Call log in Zoho CRM"""
+        access_token = await self._get_valid_token()
+        if not access_token:
+            return {"error": "Zoho CRM not connected"}
+        async with httpx.AsyncClient() as client:
+            resp = await client.post(
+                f"{self.settings.ZOHO_CRM_API_URL}/Calls",
+                headers={"Authorization": f"Zoho-oauthtoken {access_token}", "Content-Type": "application/json"},
+                json={"data": [call_data]},
+            )
+            data = resp.json()
+            return data.get("data", [{}])[0] if resp.status_code in (200, 201) else {"error": data}
+
+    async def get_events(self) -> List[Dict]:
+        """Fetch upcoming events from Zoho CRM"""
+        access_token = await self._get_valid_token()
+        if not access_token:
+            return []
+        async with httpx.AsyncClient() as client:
+            resp = await client.get(
+                f"{self.settings.ZOHO_CRM_API_URL}/Events",
+                headers={"Authorization": f"Zoho-oauthtoken {access_token}"},
+            )
+            if resp.status_code == 200:
+                return resp.json().get("data", [])
+        return []
+
+    async def get_tasks(self) -> List[Dict]:
+        """Fetch tasks from Zoho CRM"""
+        access_token = await self._get_valid_token()
+        if not access_token:
+            return []
+        async with httpx.AsyncClient() as client:
+            resp = await client.get(
+                f"{self.settings.ZOHO_CRM_API_URL}/Tasks",
+                headers={"Authorization": f"Zoho-oauthtoken {access_token}"},
+            )
+            if resp.status_code == 200:
+                return resp.json().get("data", [])
+        return []
+
+    async def push_activity_to_zoho(self, activity_type: str, subject: str, description: str, lead_zoho_id: Optional[str] = None) -> Dict:
+        """Push a local activity log to the appropriate Zoho CRM module"""
+        if activity_type == "call":
+            return await self.create_call({
+                "Subject": subject,
+                "Call_Start_Time": datetime.utcnow().isoformat(),
+                "Duration": "5",
+                "Description": description,
+                "Who_Id": lead_zoho_id,
+                "Call_Type": "Outbound",
+            })
+        elif activity_type == "meeting":
+            return await self.create_event({
+                "Event_Title": subject,
+                "Start_DateTime": datetime.utcnow().isoformat(),
+                "End_DateTime": datetime.utcnow().isoformat(),
+                "Description": description,
+                "Who_Id": lead_zoho_id,
+            })
+        else:
+            return await self.create_task({
+                "Subject": subject,
+                "Description": description,
+                "Status": "Completed",
+                "Who_Id": lead_zoho_id,
+            })

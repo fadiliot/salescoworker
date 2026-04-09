@@ -78,4 +78,21 @@ export const getContactsByLead = (leadId: string) => API.get('/api/contacts', { 
 export const updateContactRole = (id: string, role: string) => API.patch(`/api/contacts/${id}/role`, null, { params: { role } }).then(r => r.data)
 export const analyzeContactRole = (id: string) => API.post(`/api/contacts/${id}/analyze`).then(r => r.data)
 
+// ─── Meetings ────────────────────────────────────────────────────
+export const getMeetings = () => API.get('/api/meetings').then(r => r.data)
+export const createGoogleMeeting = (data: any) => API.post('/api/meetings/google', data).then(r => r.data)
+export const createZohoEvent = (data: any) => API.post('/api/meetings/zoho', data).then(r => r.data)
+
+// ─── Reports ─────────────────────────────────────────────────────
+export const getReportsSummary = () => API.get('/api/reports/summary').then(r => r.data)
+
+// ─── AI Tools ────────────────────────────────────────────────────
+export const aiProspectResearch = (data: any) => API.post('/api/ai/tools/prospect', data).then(r => r.data)
+export const aiEmailDraft = (data: any) => API.post('/api/ai/tools/email-draft', data).then(r => r.data)
+export const aiMeetingScript = (data: any) => API.post('/api/ai/tools/meeting-script', data).then(r => r.data)
+export const aiPipelineQA = (data: any) => API.post('/api/ai/tools/pipeline-qa', data).then(r => r.data)
+
+// ─── Activities ──────────────────────────────────────────────────
+export const pushActivityToZoho = (activityId: string) => API.post(`/api/activities/${activityId}/push-zoho`).then(r => r.data)
+
 export default API

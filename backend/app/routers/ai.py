@@ -195,3 +195,147 @@ def score_all_leads(db: Session = Depends(get_db)):
 def generate_followup(data: dict, db: Session = Depends(get_db)):
     from app.ai.reply_generator import generate_reply
     return generate_reply(data)
+
+
+# ──────────────────────────────────────────────
+# AI TOOLS ENDPOINTS
+# ──────────────────────────────────────────────
+
+@router.post("/tools/prospect")
+async def ai_tool_prospect(data: dict, db: Session = Depends(get_db)):
+    """Generate a prospect research brief for a company"""
+    import google.generativeai as genai
+    import os
+    company = data.get("company", "the company")
+    domain = data.get("domain", "")
+    role = data.get("role", "")
+
+    prompt = f"""You are a B2B sales research assistant. Generate a concise prospect brief for:
+Company: {company}
+Domain: {domain}
+Target Role: {role}
+
+Output a structured brief (under 250 words) covering:
+1. Company overview & likely pain points
+2. 3 personalized talking points for cold outreach
+3. Recommended first action for the sales rep
+
+Be specific, practical, and actionable."""
+
+    try:
+        genai.configure(api_key=os.environ.get("GEMINI_API_KEY", ""))
+        model = genai.GenerativeModel("gemini-2.5-flash")
+        response = model.generate_content(prompt)
+        return {"brief": response.text}
+    except Exception as e:
+        return {"brief": f"[AI unavailable] Company: {company}\n\nPlease configure GEMINI_API_KEY in backend/.env to enable prospect research.\n\nError: {str(e)}"}
+
+
+@router.post("/tools/email-draft")
+async def ai_tool_email_draft(data: dict, db: Session = Depends(get_db)):
+    """Generate a personalized cold outreach email"""
+    import google.generativeai as genai
+    import os
+    prospect_name = data.get("prospect_name", "there")
+    company = data.get("company", "your company")
+    role = data.get("role", "")
+    product = data.get("product", "our solution")
+
+    prompt = f"""You are an expert B2B sales copywriter. Write a cold outreach email:
+Prospect: {prospect_name} — {role} at {company}
+Product: {product}
+
+Requirements:
+- Subject line included
+- Under 120 words
+- Personalized, conversational, non-generic
+- Clear single CTA (15-min call)
+- Do NOT use clichés like "Hope this finds you well"
+
+Output just the email (subject + body)."""
+
+    try:
+        genai.configure(api_key=os.environ.get("GEMINI_API_KEY", ""))
+        model = genai.GenerativeModel("gemini-2.5-flash")
+        response = model.generate_content(prompt)
+        return {"email": response.text}
+    except Exception as e:
+        return {"email": f"[AI unavailable] Configure GEMINI_API_KEY to generate emails.\n\nError: {str(e)}"}
+
+
+@router.post("/tools/meeting-script")
+async def ai_tool_meeting_script(data: dict, db: Session = Depends(get_db)):
+    """Generate a meeting script with talking points and discovery questions"""
+    import google.generativeai as genai
+    import os
+    meeting_type = data.get("meeting_type", "Discovery Call")
+    attendee_role = data.get("attendee_role", "")
+    company = data.get("company", "")
+    context = data.get("context", "")
+
+    prompt = f"""You are a B2B sales coach. Generate a structured meeting script:
+Meeting Type: {meeting_type}
+Attendee: {attendee_role} at {company}
+Context: {context}
+
+Include:
+1. Opener (1-2 sentences)
+2. 4 discovery questions tailored to the role
+3. Value pivot (30-second pitch)
+4. Clear close / next step
+
+Be conversational, not scripted. Under 300 words."""
+
+    try:
+        genai.configure(api_key=os.environ.get("GEMINI_API_KEY", ""))
+        model = genai.GenerativeModel("gemini-2.5-flash")
+        response = model.generate_content(prompt)
+        return {"script": response.text}
+    except Exception as e:
+        return {"script": f"[AI unavailable] Configure GEMINI_API_KEY to generate scripts.\n\nError: {str(e)}"}
+
+
+@router.post("/tools/pipeline-qa")
+async def ai_tool_pipeline_qa(data: dict, db: Session = Depends(get_db)):
+    """Answer a free-form question about the pipeline using live data"""
+    import google.generativeai as genai
+    import os
+    from app.models.lead import Lead
+    from app.models.deal import Deal
+    from app.models.activity import Activity
+
+    question = data.get("question", "What deals need attention?")
+
+    # Build context from live DB
+    leads = db.query(Lead).order_by(Lead.score.desc()).limit(20).all()
+    deals = db.query(Deal).all()
+    recent_activities = db.query(Activity).order_by(Activity.created_at.desc()).limit(20).all()
+
+    leads_summary = "\n".join([
+        f"- {l.first_name} {l.last_name} ({l.company}) | Status: {l.status} | Score: {l.score} | Hot: {l.is_hot}"
+        for l in leads
+    ])
+    deals_summary = "\n".join([
+        f"- {d.title} | Stage: {d.stage} | Amount: {d.amount}"
+        for d in deals
+    ])
+
+    prompt = f"""You are an AI sales analyst. Here is the current pipeline data:
+
+LEADS (top 20 by score):
+{leads_summary or 'No leads yet.'}
+
+DEALS:
+{deals_summary or 'No deals yet.'}
+
+USER QUESTION: {question}
+
+Answer concisely (under 200 words), be specific and actionable."""
+
+    try:
+        genai.configure(api_key=os.environ.get("GEMINI_API_KEY", ""))
+        model = genai.GenerativeModel("gemini-2.5-flash")
+        response = model.generate_content(prompt)
+        return {"answer": response.text}
+    except Exception as e:
+        return {"answer": f"[AI unavailable] Configure GEMINI_API_KEY for pipeline analysis.\n\nError: {str(e)}"}

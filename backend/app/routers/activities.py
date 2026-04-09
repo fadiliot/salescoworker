@@ -110,3 +110,37 @@ async def get_recent_meetings(db: Session = Depends(get_db)):
     meetings = await google.get_upcoming_meetings(hours_ahead=72)
     return {"meetings": meetings}
 
+
+@router.post("/{activity_id}/push-zoho")
+async def push_activity_to_zoho(activity_id: UUID, db: Session = Depends(get_db)):
+    """Push a local activity to Zoho CRM as a Call, Task, or Event record"""
+    from app.integrations.zoho_crm import ZohoCRMClient
+    from app.models.lead import Lead
+
+    activity = db.query(Activity).filter(Activity.id == activity_id).first()
+    if not activity:
+        raise HTTPException(status_code=404, detail="Activity not found")
+
+    zoho = ZohoCRMClient(db)
+    if not zoho.is_connected():
+        raise HTTPException(status_code=503, detail="Zoho CRM not connected. Please authenticate via Settings.")
+
+    # Optionally get the lead's Zoho ID to link the record
+    lead_zoho_id = None
+    if activity.lead_id:
+        lead = db.query(Lead).filter(Lead.id == activity.lead_id).first()
+        if lead and lead.zoho_lead_id:
+            lead_zoho_id = lead.zoho_lead_id
+
+    activity_type = str(activity.activity_type).replace("ActivityType.", "")
+    subject = activity.subject or f"Activity ({activity_type})"
+    description = activity.notes or ""
+
+    result = await zoho.push_activity_to_zoho(
+        activity_type=activity_type,
+        subject=subject,
+        description=description,
+        lead_zoho_id=lead_zoho_id,
+    )
+
+    return {"success": True, "zoho_record": result, "activity_id": str(activity_id)}
