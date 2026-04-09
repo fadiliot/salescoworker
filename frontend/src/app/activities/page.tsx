@@ -102,16 +102,47 @@ export default function ActivitiesPage() {
                       </div>
                       {act.description && <p className="text-sm text-slate-400 mb-3 leading-relaxed">{act.description}</p>}
                       
-                      <div className="flex flex-wrap gap-3 mt-3">
-                        {act.outcome && (
-                          <Badge variant="outline" className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5">
-                            ✓ {act.outcome}
-                          </Badge>
-                        )}
-                        {'duration_seconds' in act && act.duration_seconds && (
-                          <Badge variant="outline" className="bg-slate-800 text-slate-300 border-slate-700 text-[10px] font-semibold tracking-wider">
-                            ⏱ {Math.round(parseInt(String(act.duration_seconds)) / 60)} min call
-                          </Badge>
+                      <div className="flex flex-wrap items-center justify-between gap-3 mt-3">
+                        <div className="flex flex-wrap gap-2">
+                          {act.outcome && (
+                            <Badge variant="outline" className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5">
+                              ✓ {act.outcome}
+                            </Badge>
+                          )}
+                          {'duration_seconds' in act && act.duration_seconds && (
+                            <Badge variant="outline" className="bg-slate-800 text-slate-300 border-slate-700 text-[10px] font-semibold tracking-wider">
+                              ⏱ {Math.round(parseInt(String(act.duration_seconds)) / 60)} min call
+                            </Badge>
+                          )}
+                          {act.zoho_id ? (
+                            <Badge variant="outline" className="bg-blue-500/10 text-blue-400 border-blue-500/30 text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5">
+                              Synced to Zoho
+                            </Badge>
+                          ) : (
+                            <Badge variant="outline" className="bg-slate-800 text-slate-500 border-slate-700 text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5">
+                              Local
+                            </Badge>
+                          )}
+                        </div>
+
+                        {!act.zoho_id && (
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="h-7 text-[10px] text-blue-400 hover:text-blue-300 hover:bg-blue-500/10 gap-1.5 px-2"
+                            onClick={async (e) => {
+                              e.stopPropagation()
+                              try {
+                                await API.post(`/api/activities/${act.id}/push-zoho`)
+                                setActivities(prev => prev.map(a => a.id === act.id ? { ...a, zoho_id: 'pending' } : a))
+                                // Re-fetch or update state
+                              } catch (err) {
+                                console.error('Push failed', err)
+                              }
+                            }}
+                          >
+                            <Zap className="w-3 h-3" /> Push to Zoho
+                          </Button>
                         )}
                       </div>
                     </CardContent>

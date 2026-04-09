@@ -11,6 +11,7 @@ import { useLanguage } from '@/context/LanguageContext'
 
 const INTEGRATIONS = [
   { key: 'zoho_crm', name: 'Zoho CRM', icon: '🔵', desc: 'Sync leads, contacts, and deals bidirectionally', authKey: 'zoho' },
+  { key: 'zoho_books', name: 'Zoho Books', icon: '📚', desc: 'Sync invoices and customer financial data', authKey: 'zoho' },
   { key: 'microsoft_outlook', name: 'Microsoft Outlook', icon: '🟦', desc: 'Read emails, send replies via Microsoft Graph API', authKey: 'microsoft' },
   { key: 'google_meet', name: 'Google Meet', icon: '🟢', desc: 'Fetch meetings and generate briefs from Google Calendar', authKey: 'google' },
   { key: 'yeastar_pbx', name: 'Yeastar PBX', icon: '📞', desc: 'Call logs, CDR, click-to-call (configured server-side)', authKey: null },

@@ -32,6 +32,7 @@ class Activity(Base):
     caller_number = Column(String(50), nullable=True)
     callee_number = Column(String(50), nullable=True)
     recording_url = Column(String(500), nullable=True)
+    zoho_id = Column(String(100), nullable=True)  # ID of synced Zoho Event/Task/Call
 
     occurred_at = Column(DateTime, default=datetime.utcnow)
     created_at = Column(DateTime, default=datetime.utcnow)

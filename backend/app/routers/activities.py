@@ -133,8 +133,8 @@ async def push_activity_to_zoho(activity_id: UUID, db: Session = Depends(get_db)
             lead_zoho_id = lead.zoho_lead_id
 
     activity_type = str(activity.activity_type).replace("ActivityType.", "")
-    subject = activity.subject or f"Activity ({activity_type})"
-    description = activity.notes or ""
+    subject = activity.title or f"Activity ({activity_type})"
+    description = activity.description or ""
 
     result = await zoho.push_activity_to_zoho(
         activity_type=activity_type,
@@ -142,5 +142,9 @@ async def push_activity_to_zoho(activity_id: UUID, db: Session = Depends(get_db)
         description=description,
         lead_zoho_id=lead_zoho_id,
     )
+
+    if result and "id" in result:
+        activity.zoho_id = result["id"]
+        db.commit()
 
     return {"success": True, "zoho_record": result, "activity_id": str(activity_id)}

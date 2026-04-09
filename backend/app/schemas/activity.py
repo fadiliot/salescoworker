@@ -26,6 +26,7 @@ class ActivityResponse(ActivityBase):
     caller_number: Optional[str] = None
     callee_number: Optional[str] = None
     recording_url: Optional[str] = None
+    zoho_id: Optional[str] = None
     created_at: datetime
 
     class Config:
